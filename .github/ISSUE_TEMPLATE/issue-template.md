@@ -7,19 +7,18 @@ assignees: ''
 
 ---
 
-*User Story:*  
+### User Story:
 Als [Benutzerrolle] möchte ich [eine Aktion durchführen], damit ich [einen Nutzen erhalte].
 
-*Akzeptanzkriterien:*  
+### Akzeptanzkriterien:
 ✅ [Bedingung 1]  
 ✅ [Bedingung 2]  
 ✅ [Bedingung 3]  
 
-*Estimated Time:* ⏳ [Geschätzte Zeit in Stunden]  
-*Actual Time:* ⏱ [Tatsächliche Zeit in Stunden]  
+**Estimated Time:** ⏳ [Geschätzte Zeit in Stunden]  
+**Actual Time:** ⏱ [Tatsächliche Zeit in Stunden]  
 
-*Tasks:*  
+### Tasks:
 - [ ] Aufgabe 1
 - [ ] Aufgabe 2
 - [ ] Aufgabe 3
-- [ ] Aufgabe 4
