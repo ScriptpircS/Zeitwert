@@ -1,4 +1,5 @@
-# Zeitwert
+# Webentwicklungsprojekt Zeitwert:
+<img src="https://github.com/user-attachments/assets/7f7d81f7-6ec8-4c57-99d5-44cd0d7c8b79" width="300"/>
 
 ### Projektbeschreibung
 
