@@ -1,13 +1,18 @@
-## Git Manual
+# Git Manual
 
-1. 
-Das Repository _git@github.com:ScriptpircS/Zeitwert.git_ in eurem Comandfenster mit
-- git clone git@github.com:ScriptpircS/Zeitwert.git /Pfad zu eurem htdocs Ordner
+
+#### **1.** 
+Das Repository _git@github.com:ScriptpircS/Zeitwert.git_ in Deinem Comandfenster mit
+- git clone git@github.com:ScriptpircS/Zeitwert.git /Pfad zu Deinem htdocs Ordner
 clonen.
 
-Example:
+Nimm dafür bitte den absoluten Pfad zu deinen htdocs Ordner
+
+**Example:**
 - git clone git@github.com:ScriptpircS/Zeitwert.git /Applications/XAMPP/htdocs/Zeitwert
 
-2. 
+[Vorausgesetzt Du hast schon einen shh key, falls nicht kontaktiere mich bitte!]
+
+#### **2.** 
 
 
