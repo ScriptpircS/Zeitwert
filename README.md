@@ -28,7 +28,7 @@ Jede Komponente befindet sich in einem eigenen Repository-Ordner.
 ### Team
 Studentisches Entwicklerteam des FH Technikum Wiens, bestehend aus:
 
-- Alexander Hagen
+- Alexander Hage
 - Johannes Voraberger
 - Niklas Sterling
 - Ömer Ündemir
