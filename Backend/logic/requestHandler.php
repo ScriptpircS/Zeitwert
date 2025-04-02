@@ -1,5 +1,6 @@
 <?php
-include dbaccess.php; /* Datenbankverbindung */
+include 'config/dbaccess.php';
+/* Datenbankverbindung */
 
 /* JSON-Daten empfangen*/
 $inputData = json_decode(file_get_contents('php://input'), true);
