@@ -1,5 +1,7 @@
 document.getElementById("registrationForm").addEventListener("submit", function(event) {
-    event.preventDefault();
+    event.preventDefault(); // Prevent the default form submission
+
+    // Gather form data into an object
     const formData = {
         anrede: document.getElementById("anrede").value,
         vorname: document.getElementById("vorname").value,
@@ -8,25 +10,31 @@ document.getElementById("registrationForm").addEventListener("submit", function(
         plz: document.getElementById("plz").value,
         ort: document.getElementById("ort").value,
         email: document.getElementById("email").value,
-        benutzername: document.getElementById("benutzername").value,
+        username: document.getElementById("username").value,
         password: document.getElementById("password").value,
         password_repeat: document.getElementById("password_repeat").value,
-        zahlungsinfo: document.getElementById("zahlungsinfo").value
     };
 
-    if (formData.password !== formData.password_repeat) { /* Passwortüberprüfung */
+    // Validate that passwords match
+    if (formData.password !== formData.password_repeat) {
         alert("Die Passwörter stimmen nicht überein.");
         return;
     }
 
-    fetch('backend/register.php', { /* Asynchrone Anfrage an das Backend senden */
+    // Send the form data to the backend using fetch()
+    fetch('http://localhost/Zeitwert/Zeitwert/backend/logic/requestHandler.php', { 
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(formData) 
+        body: JSON.stringify(formData)  // Send the form data as JSON
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) { // Check if the response was not successful
+            throw new Error('Network response was not ok');
+        }
+        return response.json();  // Parse the JSON response
+    })
     .then(data => {
         if (data.success) {
             alert("Benutzer erfolgreich registriert!");
@@ -35,7 +43,7 @@ document.getElementById("registrationForm").addEventListener("submit", function(
         }
     })
     .catch(error => {
-        console.error("Error:", error);
-        alert("Es gab einen Fehler bei der Registrierung.");
+        console.error("Error:", error);  // More details in the console
+        alert("Error during registration.");
     });
 });

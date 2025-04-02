@@ -1,11 +1,17 @@
 <?php
-include 'config/dbaccess.php'; // Include die dbaccess-Klasse
+include 'config/dbaccess.php';
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type");
 
-/* JSON-Daten empfangen */
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
+
 $inputData = json_decode(file_get_contents('php://input'), true);
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Die Eingabedaten aus dem JSON holen
     $anrede = $inputData['anrede'];
     $vorname = $inputData['vorname'];
     $nachname = $inputData['nachname'];
@@ -13,31 +19,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $plz = $inputData['plz'];
     $ort = $inputData['ort'];
     $email = $inputData['email'];
-    $benutzername = $inputData['benutzername'];
+    $username = $inputData['username'];
     $password = $inputData['password'];
     $password_repeat = $inputData['password_repeat'];
-    $zahlungsinfo = $inputData['zahlungsinfo'];
-
-    // Validierung der Eingabedaten
-    if (empty($vorname) || empty($nachname) || empty($adresse) || empty($email)) {
-        echo json_encode(["success" => false, "message" => "Bitte füllen Sie alle Pflichtfelder aus."]);
-        exit();
-    }
-
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        echo json_encode(["success" => false, "message" => "Ungültige E-Mail-Adresse."]);
-        exit();
-    }
 
     if ($password !== $password_repeat) {
         echo json_encode(["success" => false, "message" => "Die Passwörter stimmen nicht überein."]);
         exit();
     }
-    $password_hash = password_hash($password, PASSWORD_DEFAULT); /*Passwordhashing*/
+
+    $password_hash = password_hash($password, PASSWORD_DEFAULT);
 
     $db = dbaccess::getInstance();
     $sql = "INSERT INTO users (anrede, vorname, nachname, adresse, plz, ort, email, benutzername, password, zahlungsinfo)
             VALUES (:anrede, :vorname, :nachname, :adresse, :plz, :ort, :email, :benutzername, :password, :zahlungsinfo)";
+
     $params = [
         ':anrede' => $anrede,
         ':vorname' => $vorname,
@@ -48,13 +44,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         ':email' => $email,
         ':username' => $username,
         ':password' => $password_hash,
-        ':zahlungsinfo' => $zahlungsinfo
+
     ];
 
-    // Führe das Prepared Statement aus
+    // Execute the query and check if the insertion was successful
     if ($db->execute($sql, $params)) {
         echo json_encode(["success" => true, "message" => "Benutzer erfolgreich registriert."]);
     } else {
+        // If the insertion failed, respond with an error message
         echo json_encode(["success" => false, "message" => "Fehler bei der Registrierung."]);
     }
 }
