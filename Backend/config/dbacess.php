@@ -5,9 +5,9 @@ class dbaccess {
 
     private function __construct() {
         $host = 'localhost';
-        $dbname = 'webshop';
+        $dbname = 'zeitwert';
         $user = 'root';
-        $pass = 'dein_passwort'; // ggf. anpassen
+        $pass = ''; 
 
         try {
             $this->pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
