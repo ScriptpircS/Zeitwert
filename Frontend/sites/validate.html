@@ -1,0 +1,41 @@
+<form id="registrationForm">
+    <label for="anrede">Anrede:</label>
+    <select id="anrede" name="anrede" required>
+        <option value="Herr">Herr</option>
+        <option value="Frau">Frau</option>
+    </select><br>
+
+    <label for="vorname">Vorname:</label>
+    <input type="text" id="vorname" name="vorname" required><br>
+
+    <label for="nachname">Nachname:</label>
+    <input type="text" id="nachname" name="nachname" required><br>
+
+    <label for="adresse">Adresse:</label>
+    <input type="text" id="adresse" name="adresse" required><br>
+
+    <label for="plz">PLZ:</label>
+    <input type="text" id="plz" name="plz" pattern="\d{5}" required><br>
+
+    <label for="ort">Ort:</label>
+    <input type="text" id="ort" name="ort" required><br>
+
+    <label for="email">Emailadresse:</label>
+    <input type="email" id="email" name="email" required><br>
+
+    <label for="benutzername">Benutzername:</label>
+    <input type="text" id="benutzername" name="benutzername" required><br>
+
+    <label for="password">Passwort:</label>
+    <input type="password" id="password" name="password" required><br>
+
+    <label for="password_repeat">Passwort wiederholen:</label>
+    <input type="password" id="password_repeat" name="password_repeat" required><br>
+
+    <label for="zahlungsinfo">Zahlungsinformationen:</label>
+    <input type="text" id="zahlungsinfo" name="zahlungsinfo" required><br>
+
+    <button type="submit">Registrieren</button>
+</form>
+
+<script src="script.js"></script>
