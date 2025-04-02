@@ -1,5 +1,5 @@
 <?php
-include('..\config\dbacess.php');
+include('..\config\dbaccess.php');
 
 $response =array('success' => false);
 $db = dbaccess::getInstance();
