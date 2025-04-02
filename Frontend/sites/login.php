@@ -1,5 +1,5 @@
 <?php
-
+session_start();
 require '../../Backend/config/dbacess.php'; // Verbindung zur DB
 
 $errors = $_SESSION["login_errors"] ?? [];
@@ -40,13 +40,16 @@ unset($_SESSION["login_errors"]); // Fehler nach Anzeige entfernen
             <button name="submit_login" type="submit" class="btn btn-primary">Login</button>
         </form>
 
-        <?php
-        if (!empty($errors)) {
-            foreach ($errors as $error) {
-                echo "<div class='alert alert-danger mt-2'>$error</div>";
-            }
-        }
-        ?>
+        
+        <?php if (!empty($errors)): ?>
+            <div class="alert alert-danger mt-3">
+                <ul>
+                    <?php foreach ($errors as $error): ?>
+                        <li><?= htmlspecialchars($error) ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        <?php endif; ?>
     </section>
 </body>
 

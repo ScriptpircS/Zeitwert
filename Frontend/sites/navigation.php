@@ -1,4 +1,4 @@
-<?php session_start(); ?>
+<?php // Hier war ein Sessionstart --> direkt zu login.php verschoben ?> 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
         <a class="navbar-brand" href="index.php">Zeitwert</a>
