@@ -1,15 +1,16 @@
 <?php
 include('..\config\dbaccess.php');
 
-$response =array('success' => false);
+$response = array('success' => false);
 $db = dbaccess::getInstance();
 
-if(isset($_POST['email']) && $_POST['email'] != ''){
-    // Prepare the SQL query with placeholders
-    $sql = "INSERT INTO users (anrede, vorname, nachname, adresse, plz, ort, email, username, password)
-            VALUES (:anrede, :vorname, :nachname, :adresse, :plz, :ort, :email, :username, :password)";
-    
-    // Bind the parameters from the POST data
+if (isset($_POST['email']) && $_POST['email'] != '') {
+    $sql = "INSERT INTO users (
+                anrede, vorname, nachname, adresse, plz, ort, email, username, password_hash
+            ) VALUES (
+                :anrede, :vorname, :nachname, :adresse, :plz, :ort, :email, :username, :password_hash
+            )";
+
     $params = [
         ':anrede' => $_POST['anrede'],
         ':vorname' => $_POST['vorname'],
@@ -19,12 +20,13 @@ if(isset($_POST['email']) && $_POST['email'] != ''){
         ':ort' => $_POST['ort'],
         ':email' => $_POST['email'],
         ':username' => $_POST['username'],
-        ':password' => password_hash($_POST['password'], PASSWORD_DEFAULT) // Hash the password for security
+        ':password_hash' => password_hash($_POST['password'], PASSWORD_DEFAULT)
     ];
-    
+
     if ($db->execute($sql, $params)) {
         $response['success'] = true;
     }
 }
+
 echo json_encode($response);
 ?>
