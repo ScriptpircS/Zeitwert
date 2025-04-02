@@ -31,8 +31,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password_hash = password_hash($password, PASSWORD_DEFAULT);
 
     $db = dbaccess::getInstance();
-    $sql = "INSERT INTO users (anrede, vorname, nachname, adresse, plz, ort, email, benutzername, password, zahlungsinfo)
-            VALUES (:anrede, :vorname, :nachname, :adresse, :plz, :ort, :email, :benutzername, :password, :zahlungsinfo)";
+    $sql = "INSERT INTO users (anrede, vorname, nachname, adresse, plz, ort, email, benutzername, password)
+            VALUES (:anrede, :vorname, :nachname, :adresse, :plz, :ort, :email, :benutzername, :password)";
 
     $params = [
         ':anrede' => $anrede,
