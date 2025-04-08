@@ -1,4 +1,5 @@
 <?php
+
 include('..\config\dbaccess.php');
 
 $response = array('success' => false);
@@ -29,4 +30,5 @@ if (isset($_POST['email']) && $_POST['email'] != '') {
 }
 
 echo json_encode($response);
+
 ?>
