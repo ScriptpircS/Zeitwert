@@ -1,48 +1,34 @@
 <?php
-include 'config/dbaccess.php'; /* Datenbankverbindung */
 
-/* JSON-Daten empfangen*/
-$inputData = json_decode(file_get_contents('php://input'), true);
+include('..\config\dbaccess.php');
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $anrede = $inputData['anrede'];
-    $vorname = $inputData['vorname'];
-    $nachname = $inputData['nachname'];
-    $adresse = $inputData['adresse'];
-    $plz = $inputData['plz'];
-    $ort = $inputData['ort'];
-    $email = $inputData['email'];
-    $benutzername = $inputData['benutzername'];
-    $password = $inputData['password'];
-    $password_repeat = $inputData['password_repeat'];
-    $zahlungsinfo = $inputData['zahlungsinfo'];
+$response = array('success' => false);
+$db = dbaccess::getInstance();
 
-    if (empty($vorname) || empty($nachname) || empty($adresse) || empty($email)) {
-        echo json_encode(["success" => false, "message" => "Bitte füllen Sie alle Pflichtfelder aus."]);
-        exit();
+if (isset($_POST['email']) && $_POST['email'] != '') {
+    $sql = "INSERT INTO users (
+                anrede, vorname, nachname, adresse, plz, ort, email, username, password_hash
+            ) VALUES (
+                :anrede, :vorname, :nachname, :adresse, :plz, :ort, :email, :username, :password_hash
+            )";
+
+    $params = [
+        ':anrede' => $_POST['anrede'],
+        ':vorname' => $_POST['vorname'],
+        ':nachname' => $_POST['nachname'],
+        ':adresse' => $_POST['adresse'],
+        ':plz' => $_POST['plz'],
+        ':ort' => $_POST['ort'],
+        ':email' => $_POST['email'],
+        ':username' => $_POST['username'],
+        ':password_hash' => password_hash($_POST['password'], PASSWORD_DEFAULT)
+    ];
+
+    if ($db->execute($sql, $params)) {
+        $response['success'] = true;
     }
-
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        echo json_encode(["success" => false, "message" => "Ungültige E-Mail-Adresse."]);
-        exit();
-    }
-
-    if ($password !== $password_repeat) {
-        echo json_encode(["success" => false, "message" => "Die Passwörter stimmen nicht überein."]);
-        exit();
-    }
-    $password_hash = password_hash($password, PASSWORD_DEFAULT); /*Password Hashing*/
-
-    /* SQL-Query zum Einfügen des neuen Users */
-    $sql = "INSERT INTO users (anrede, vorname, nachname, adresse, plz, ort, email, benutzername, password, zahlungsinfo)
-            VALUES ('$anrede', '$vorname', '$nachname', '$adresse', '$plz', '$ort', '$email', '$benutzername', '$password_hash', '$zahlungsinfo')";
-
-    if ($conn->query($sql) === TRUE) {
-        echo json_encode(["success" => true, "message" => "Benutzer erfolgreich registriert."]);
-    } else {
-        echo json_encode(["success" => false, "message" => "Fehler: " . $conn->error]);
-    }
-
-    $conn->close();
 }
+
+echo json_encode($response);
+
 ?>
