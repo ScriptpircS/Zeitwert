@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <script defer src="..\js\script.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+<body>
+    <script src="..\js\navbar.js"></script>
+    <section class="container py-2">
+        <h1>Zeitwert Login</h1>
+        <form id="loginForm" method="POST">
+            <label for="loginCredentials">Benutzername oder E-Mail:</label>
+            <input type="text" id="loginCredentials" name="loginCredentials" required>
+            <br>
+            <label for="password">Passwort:</label>
+            <input type="text" id="password" name="password" required>
+            <br>
+            <button type="button" onclick="submitLogin();">Einloggen</button>
+        </form>
+    </section>
+</body>
+</html>

@@ -43,4 +43,3 @@ class dbaccess {
         return $this->pdo->lastInsertId();
     }
 }
-?>
