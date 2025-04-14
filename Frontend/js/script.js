@@ -100,8 +100,8 @@ function renderProducts(products) {
 function submitLogin() {
   const loginCredentials = $("#loginCredentials").val();
   const password = $("#password").val();
-  let stayLoggedIn = $("#stayLoggedIn").is(":checked");
-  
+  const stayLoggedIn = $("#stayLoggedIn").is(":checked");
+
   if (!loginCredentials || !password) {
     alert("Bitte Benutzername und Passwort eingeben.");
     return;
@@ -114,15 +114,11 @@ function submitLogin() {
       action: "login",
       loginCredentials: loginCredentials,
       password: password,
+      stayLoggedIn: stayLoggedIn
     },
     success: function (response) {
       console.log(response);
       if (response.success) {
-        if (stayLoggedIn) {
-          document.cookie = `stayLoggedIn=${loginCredentials}; path=/; max-age=${
-            60 * 60 * 24 * 30
-          }`; // 30 Tage
-        }
         alert(response.message);
         window.location.href = "../../index.html";
       } else {

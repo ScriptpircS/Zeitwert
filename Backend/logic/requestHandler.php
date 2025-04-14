@@ -21,11 +21,17 @@ if ($action === 'autoLogin') {
     if (empty($loginCredentials)) {
         $response['message'] = "Kein Benutzer gespeichert.";
     } else {
-        $sql = "SELECT username FROM users WHERE username = ? OR email = ?";
         $result = $userModel->getByEmailOrUsername($loginCredentials);
 
         if (count($result) === 1) {
             $_SESSION["username"] = $result[0]['username'];
+
+            // Setze den stayLoggedIn-Cookie im Backend
+            setcookie("stayLoggedIn", $loginCredentials, [
+                'expires' => time() + (86400 * 30), // 30 Tage
+                'path' => '/'
+            ]);
+
             $response['success'] = true;
             $response['username'] = $result[0]['username'];
             $response['message'] = "Automatisch eingeloggt.";
@@ -35,11 +41,13 @@ if ($action === 'autoLogin') {
     }
 }
 
+
 // ==== LOGIN =============================================================
 
 if ($action === 'login') {
     $loginCredentials = $_POST['loginCredentials'] ?? '';
     $password = $_POST['password'] ?? '';
+    $stayLoggedIn = $_POST['stayLoggedIn'] ?? false;
 
     if (empty($loginCredentials) || empty($password)) {
         $response['message'] = "Bitte füllen Sie alle Felder aus.";
@@ -48,6 +56,12 @@ if ($action === 'login') {
 
         if (count($result) === 1 && password_verify($password, $result[0]['password_hash'])) {
             $_SESSION["username"] = $result[0]['username'];
+            if ($stayLoggedIn === "true" || $stayLoggedIn === true) {
+                setcookie("stayLoggedIn", $loginCredentials, [
+                    'expires' => time() + (86400 * 30),
+                    'path' => '/'
+                ]);
+            }
             $response['success'] = true;
             $response['message'] = "Eingeloggt! Hallo " . $result[0]['username'];
         } else {
