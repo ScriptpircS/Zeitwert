@@ -1,9 +1,16 @@
-<nav class="navbar">
-  <div class="navbar-brand">Zeitwert</div>
-  <div class="navbar-links">
-    <span id="welcomeUser" style="display: none;"></span>
-    <a href="Register.html">Registrieren</a>
-    <a href="login.html" id="loginLink">Login</a>
-    <a href="#" id="logoutLink" style="display: none;">Logout</a>
+<nav class="navbar navbar-expand-lg navbar-light bg-light px-4">
+  <a class="navbar-brand" href="#">Zeitwert</a>
+  <div class="collapse navbar-collapse justify-content-end">
+    <span id="welcomeUser" class="me-3 d-none"></span>
+
+    <a href="#" class="nav-link" id="registerLink">Registrieren</a>
+    <a href="#" class="nav-link" id="loginLink">Login</a>
+    <a href="#" class="nav-link d-none" id="accountLink">Mein Konto</a>
+    <a href="#" class="nav-link d-none" id="logoutLink">Logout</a>
+
+    <!-- Nur für Admin -->
+    <a href="#" class="nav-link d-none" id="adminProductsLink">Produkte</a>
+    <a href="#" class="nav-link d-none" id="adminCustomersLink">Kunden</a>
+    <a href="#" class="nav-link d-none" id="adminCouponsLink">Gutscheine</a>
   </div>
 </nav>
