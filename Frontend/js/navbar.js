@@ -26,6 +26,7 @@ function fixNavbarLinks(isDeep) {
         "Zeitwert": "index.html",
         "loginLink": "Frontend/sites/login.html",
         "registerLink": "Frontend/sites/Register.html",
+        "Warenkorb": "Frontend/sites/cart.html",
         "accountLink": "Frontend/sites/account.html",
         "adminProductsLink": "Frontend/sites/admin/products.html",
         "adminCustomersLink": "Frontend/sites/admin/customers.html",

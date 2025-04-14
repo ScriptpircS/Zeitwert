@@ -91,6 +91,56 @@ if ($action === 'login') {
         $response['message'] = "E-Mail oder Benutzername fehlt.";
     }
 
+// ==== IN DEN WARENKORB LEGEN ============================================
+
+} elseif ($action === 'addToCart') {
+    $productId = $_POST['productId'] ?? null;
+
+    if ($productId !== null) {
+        $product = $productModel->getProductById($productId); 
+
+        if ($product) {
+            if (!isset($_SESSION['cart'])) {
+                $_SESSION['cart'] = [];
+            }
+
+            if (!isset($_SESSION['cart'][$productId])) {
+                $_SESSION['cart'][$productId] = ['qty' => 1, 'product' => $product];
+            } else {
+                $_SESSION['cart'][$productId]['qty']++;
+            }
+
+            $totalQty = array_sum(array_column($_SESSION['cart'], 'qty'));
+            $response = ['success' => true, 'cartCount' => $totalQty];
+        }
+    }
+// ==== WARENKORB ANZEIGEN ===============================================
+
+} elseif ($action === 'getCart') {
+    $cart = $_SESSION['cart'] ?? [];
+
+    $gesamtpreis = 0;
+    $gesamtmenge = 0;
+
+    foreach ($cart as $item) {
+        $gesamtpreis += $item['product']['preis'] * $item['qty'];
+        $gesamtmenge += $item['qty'];
+    }
+
+    $response['success'] = true;
+    $response['cart'] = $cart;
+    $response['gesamtpreis'] = $gesamtpreis;
+    $response['gesamtmenge'] = $gesamtmenge;
+
+// ==== WARENKORB VERÄNDERN ===============================================
+
+} elseif ($action === 'removeFromCart') {
+    unset($_SESSION['cart'][$_POST['productId']]);
+
+} elseif ($action === 'updateCartQuantity') {
+    $_SESSION['cart'][$_POST['productId']]['qty'] = $_POST['quantity'];
+
+
 // ==== PRODUKTÜBERSICHT LADEN ============================================
 
 } elseif ($action === 'getProducts') {
@@ -111,6 +161,8 @@ if ($action === 'login') {
         $response['message'] = "Keine Kategorie-ID übergeben.";
     }
 }    
+
+
 
 // ==== DEFAULT: UNBEKANNTE AKTION ========================================
 
