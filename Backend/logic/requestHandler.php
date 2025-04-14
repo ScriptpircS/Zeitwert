@@ -14,6 +14,27 @@ $action = $_POST['action'] ?? '';
 $userModel = new User();
 $productModel = new Product();
 
+// ==== AUTO-LOGIN =========================================================
+if ($action === 'autoLogin') {
+    $loginCredentials = $_POST['loginCredentials'] ?? '';
+
+    if (empty($loginCredentials)) {
+        $response['message'] = "Kein Benutzer gespeichert.";
+    } else {
+        $sql = "SELECT username FROM users WHERE username = ? OR email = ?";
+        $result = $userModel->getByEmailOrUsername($loginCredentials);
+
+        if (count($result) === 1) {
+            $_SESSION["username"] = $result[0]['username'];
+            $response['success'] = true;
+            $response['username'] = $result[0]['username'];
+            $response['message'] = "Automatisch eingeloggt.";
+        } else {
+            $response['message'] = "Benutzer nicht gefunden.";
+        }
+    }
+}
+
 // ==== LOGIN =============================================================
 
 if ($action === 'login') {
@@ -26,7 +47,7 @@ if ($action === 'login') {
         $result = $userModel->getByEmailOrUsername($loginCredentials);
 
         if (count($result) === 1 && password_verify($password, $result[0]['password_hash'])) {
-            $_SESSION["Benutzername"] = $result[0]['username'];
+            $_SESSION["username"] = $result[0]['username'];
             $response['success'] = true;
             $response['message'] = "Eingeloggt! Hallo " . $result[0]['username'];
         } else {
