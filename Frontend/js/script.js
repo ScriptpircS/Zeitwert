@@ -16,6 +16,17 @@ $(document).ready(function () {
     e.preventDefault();
     submitLogin();
   });
+
+  // Alle Produkte anzeigen
+  $("#categorySelect").on("change", function () {
+    const selectedCat = $(this).val();
+    if (selectedCat) {
+      fetchProductsByCategory(selectedCat);
+    } else {
+      fetchProducts(); 
+    }
+  });
+
 });
 
 
@@ -38,6 +49,27 @@ function fetchProducts() {
   });
 }
 
+function fetchProductsByCategory(categoryId) {
+  $.ajax({
+    url: "http://localhost/Zeitwert/Backend/logic/requestHandler.php",
+    type: "POST",
+    data: {
+      action: "getProductsByCategory",
+      categoryId: categoryId
+    },
+    success: function (response) {
+      if (response.success) {
+        renderProducts(response.products);
+      } else {
+        console.error("Fehler beim Filtern:", response.message);
+      }
+    },
+    error: function (xhr, status, error) {
+      console.error("AJAX Fehler:", error);
+    }
+  });
+}
+
 function renderProducts(products) {
   const $container = $("#productContainer");
   if ($container.length === 0) return;
@@ -50,7 +82,7 @@ function renderProducts(products) {
     const $card = $(`
       <div class="col-sm-6 col-md-4 col-lg-3">
         <div class="product-card">
-          <img src="${product.bild_url}" alt="${product.modell}">
+          <img src="/Zeitwert/Backend/productpictures/${product.bild_url}" alt="${product.modell}">
           <h3>${product.marke} – ${product.modell}</h3>
           <p><strong>€ ${parseFloat(product.preis || 0).toFixed(2)}</strong></p>
           <p class="stars">${stars}</p>

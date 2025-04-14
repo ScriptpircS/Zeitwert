@@ -64,9 +64,22 @@ if ($action === 'login') {
     $response['success'] = true;
     $response['products'] = $products;
 
+
+} elseif ($action === 'getProductsByCategory') {
+    $catId = $_POST['categoryId'] ?? null;
+
+    if ($catId !== null) {
+        $products = $productModel->getProductsByCategory($catId);
+        $response['success'] = true;
+        $response['products'] = $products;
+    } else {
+        $response['message'] = "Keine Kategorie-ID übergeben.";
+    }
+}    
+
 // ==== DEFAULT: UNBEKANNTE AKTION ========================================
 
-} else {
+else {
     $response['message'] = "Ungültige Aktion.";
 }
 
