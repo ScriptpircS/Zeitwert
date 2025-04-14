@@ -18,5 +18,12 @@ class Product {
         $sql = "SELECT * FROM products WHERE category_id = ?";
         return $this->db->select($sql, [$categoryId]);
     }
+
+    public function getProductById($id) {
+        $sql = "SELECT * FROM products WHERE id = :id";
+        $params = [':id' => $id];
+    
+        return $this->db->select($sql, $params)[0] ?? null;
+    }
     
 }
