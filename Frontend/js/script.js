@@ -26,14 +26,14 @@ $(document).ready(function () {
       fetchProducts();
     }
   });
-
-  ladeWarenkorb();
-  fetchCartCount();
-
+  
   // Live-Suche
   $('#searchFilter').on('input', function () {
     applySearchFilter();
   });
+
+  ladeWarenkorb();
+  fetchCartCount();  
   
 });
 
@@ -138,6 +138,7 @@ function renderProducts(products) {
 function submitLogin() {
   const loginCredentials = $("#loginCredentials").val();
   const password = $("#password").val();
+  const stayLoggedIn = $("#stayLoggedIn").is(":checked");
 
   if (!loginCredentials || !password) {
     alert("Bitte Benutzername und Passwort eingeben.");
@@ -151,6 +152,7 @@ function submitLogin() {
       action: "login",
       loginCredentials: loginCredentials,
       password: password,
+      stayLoggedIn: stayLoggedIn
     },
     success: function (response) {
       console.log(response);

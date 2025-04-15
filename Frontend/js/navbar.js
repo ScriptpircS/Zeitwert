@@ -10,7 +10,12 @@ function loadNavbar() {
             document.body.insertBefore(navbarContainer, document.body.firstChild);
 
             fixNavbarLinks(isDeep);
+            /*
             handleUserSession(isDeep);
+            */            
+            checkAutoLogin().then(() => {
+                handleUserSession(isDeep);
+            });
         });
 }
 
@@ -73,5 +78,42 @@ function handleUserSession(isDeep) {
         }
     });
 }
+// Hilfsfunktion, Prüft gespeicherte Cookies
+function getCookieValue(name) {
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+        let [key, val] = cookie.trim().split('=');
+        if (key === name) return val;
+    }
+    return null;
+}
+
+// Loggt User ein, wenn stayLoggedIn gesetzt wurde
+async function checkAutoLogin() {
+    const savedUser = getCookieValue("stayLoggedIn");
+
+    if (savedUser) {
+        try {
+            const response = await $.ajax({
+                url: "http://localhost/Zeitwert/Backend/logic/requestHandler.php",
+                type: "POST",
+                data: {
+                    action: "autoLogin",
+                    loginCredentials: savedUser
+                }
+            });
+
+            if (response.success) {
+                console.log("Auto-Login erfolgreich:", response.username);
+            } else {
+                console.log("Auto-Login fehlgeschlagen:", response.message);
+            }
+        } catch (error) {
+            console.error("Fehler beim Auto-Login:", error);
+        }
+    }
+}
+
+
 
 document.addEventListener("DOMContentLoaded", loadNavbar);
