@@ -26,4 +26,15 @@ class Product {
         return $this->db->select($sql, $params)[0] ?? null;
     }
     
+    public function searchProducts($query) {
+        $sql = "SELECT * FROM products 
+                WHERE LOWER(marke) LIKE ? 
+                   OR LOWER(modell) LIKE ? 
+                   OR LOWER(beschreibung) LIKE ?";
+        
+        $likeQuery = '%' . strtolower($query) . '%';
+        return $this->db->select($sql, [$likeQuery, $likeQuery, $likeQuery]);
+    }
+    
+    
 }

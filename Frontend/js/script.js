@@ -26,9 +26,16 @@ $(document).ready(function () {
       fetchProducts();
     }
   });
+  
+  // Live-Suche
+  $('#searchFilter').on('input', function () {
+    applySearchFilter();
+  });
 
   ladeWarenkorb();
-  fetchCartCount();
+  fetchCartCount();  
+  
+});
 
 // ========== PRODUKTE LADEN ==========
 function fetchProducts() {
@@ -84,11 +91,15 @@ function renderProducts(products) {
     const $card = $(`
       <div class="col-sm-6 col-md-4 col-lg-3">
         <div class="product-card" draggable="true" data-id="${product.id}">
-          <img src="/Zeitwert/Backend/productpictures/${product.bild_url}" alt="${product.modell}">
+          <img src="/Zeitwert/Backend/productpictures/${
+            product.bild_url
+          }" alt="${product.modell}">
           <h3>${product.marke} – ${product.modell}</h3>
           <p><strong>€ ${parseFloat(product.preis || 0).toFixed(2)}</strong></p>
           <p class="stars">${stars}</p>
-          <button class="btn btn-primary add-to-cart-btn" data-id="${product.id}">
+          <button class="btn btn-primary add-to-cart-btn" data-id="${
+            product.id
+          }">
             In den Warenkorb
           </button>
         </div>
@@ -106,7 +117,7 @@ function renderProducts(products) {
       type: "POST",
       data: {
         action: "addToCart",
-        productId: productId
+        productId: productId,
       },
       dataType: "json",
       success: function (response) {
@@ -118,7 +129,7 @@ function renderProducts(products) {
       },
       error: function (xhr, status, error) {
         console.error("AJAX-Fehler:", error);
-      }
+      },
     });
   });
 }
@@ -217,10 +228,9 @@ function ladeWarenkorb() {
 
         if (Object.keys(cart).length === 0) {
           $container.html("<p>Dein Warenkorb ist leer.</p>");
-          $("#cart-count").text("0"); 
+          $("#cart-count").text("0");
           return;
         }
-        
 
         let gesamtpreis = 0;
 
@@ -233,7 +243,9 @@ function ladeWarenkorb() {
           const $card = $(`
             <div class="col-sm-6 col-md-4 col-lg-3">
               <div class="product-card warenkorb-card">
-                <img src="/Zeitwert/Backend/productpictures/${produkt.bild_url}" alt="${produkt.modell}">
+                <img src="/Zeitwert/Backend/productpictures/${
+                  produkt.bild_url
+                }" alt="${produkt.modell}">
                 <h3>${produkt.marke} – ${produkt.modell}</h3>
                 <p>Einzelpreis: € ${parseFloat(produkt.preis).toFixed(2)}</p>
                 <p>Gesamt: <strong>€ ${preis.toFixed(2)}</strong></p>
@@ -249,7 +261,11 @@ function ladeWarenkorb() {
           $container.append($card);
         });
 
-        $container.append(`<div class="col-12"><hr><h4>🧾 Gesamtbetrag: € ${gesamtpreis.toFixed(2)}</h4></div>`);
+        $container.append(
+          `<div class="col-12"><hr><h4>🧾 Gesamtbetrag: € ${gesamtpreis.toFixed(
+            2
+          )}</h4></div>`
+        );
 
         // 🛒 Symbol aktualisieren
         $("#cart-count").text(response.gesamtmenge);
@@ -257,11 +273,9 @@ function ladeWarenkorb() {
     },
     error: function (xhr, status, error) {
       console.error("Fehler beim Laden des Warenkorbs:", error);
-    }
+    },
   });
 }
-
-
 
 function entferneProdukt(productId) {
   $.ajax({
@@ -269,17 +283,16 @@ function entferneProdukt(productId) {
     type: "POST",
     data: {
       action: "removeFromCart",
-      productId: productId
+      productId: productId,
     },
     success: function () {
       ladeWarenkorb();
     },
     error: function (xhr, status, error) {
       console.error("Fehler beim Entfernen des Produkts:", error);
-    }
+    },
   });
 }
-
 
 function aktualisiereMenge(productId, menge) {
   $.ajax({
@@ -288,14 +301,14 @@ function aktualisiereMenge(productId, menge) {
     data: {
       action: "updateCartQuantity",
       productId: productId,
-      quantity: parseInt(menge)
+      quantity: parseInt(menge),
     },
     success: function () {
       ladeWarenkorb();
     },
     error: function (xhr, status, error) {
       console.error("Fehler beim Aktualisieren der Menge:", error);
-    }
+    },
   });
 }
 
@@ -309,10 +322,34 @@ function fetchCartCount() {
       if (res.success) {
         $("#cart-count").text(res.gesamtmenge);
       }
-    }
+    },
   });
 }
 
+// ========== PRODUKTE SUCHEN (CONTINIOUS SEARCH FILTER) ==========
+function applySearchFilter() {
+  const input = $('#searchFilter').val();
+
+  $.ajax({
+    url: "http://localhost/Zeitwert/Backend/logic/requestHandler.php",
+    type: "POST",
+    data: {
+      action: "searchProducts",
+      query: input
+    },
+    success: function (response) {
+      if (response.success) {
+        renderProducts(response.products);
+      } else {
+        renderProducts([]); // leere Liste anzeigen
+        $('#productContainer').text(response.message).show();
+      }
+    },
+    error: function (xhr, status, error) {
+      console.error("Fehler bei der Suche:", error);
+    }
+  });
+}
 
 
 
