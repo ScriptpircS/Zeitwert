@@ -23,17 +23,19 @@ $(document).ready(function () {
     if (selectedCat) {
       fetchProductsByCategory(selectedCat);
     } else {
-      fetchProducts(); 
+      fetchProducts();
     }
   });
 
   ladeWarenkorb();
   fetchCartCount();
- 
 
-
+  // Live-Suche
+  $('#searchFilter').on('input', function () {
+    applySearchFilter();
+  });
+  
 });
-
 
 // ========== PRODUKTE LADEN ==========
 function fetchProducts() {
@@ -50,7 +52,7 @@ function fetchProducts() {
     },
     error: function (xhr, status, error) {
       console.error("AJAX Fehler:", error);
-    }
+    },
   });
 }
 
@@ -60,7 +62,7 @@ function fetchProductsByCategory(categoryId) {
     type: "POST",
     data: {
       action: "getProductsByCategory",
-      categoryId: categoryId
+      categoryId: categoryId,
     },
     success: function (response) {
       if (response.success) {
@@ -71,7 +73,7 @@ function fetchProductsByCategory(categoryId) {
     },
     error: function (xhr, status, error) {
       console.error("AJAX Fehler:", error);
-    }
+    },
   });
 }
 
@@ -81,17 +83,23 @@ function renderProducts(products) {
 
   $container.empty();
 
-  products.forEach(product => {
-    const stars = "★".repeat(product.bewertung || 0) + "☆".repeat(5 - (product.bewertung || 0));
+  products.forEach((product) => {
+    const stars =
+      "★".repeat(product.bewertung || 0) +
+      "☆".repeat(5 - (product.bewertung || 0));
 
     const $card = $(`
       <div class="col-sm-6 col-md-4 col-lg-3">
         <div class="product-card" draggable="true" data-id="${product.id}">
-          <img src="/Zeitwert/Backend/productpictures/${product.bild_url}" alt="${product.modell}">
+          <img src="/Zeitwert/Backend/productpictures/${
+            product.bild_url
+          }" alt="${product.modell}">
           <h3>${product.marke} – ${product.modell}</h3>
           <p><strong>€ ${parseFloat(product.preis || 0).toFixed(2)}</strong></p>
           <p class="stars">${stars}</p>
-          <button class="btn btn-primary add-to-cart-btn" data-id="${product.id}">
+          <button class="btn btn-primary add-to-cart-btn" data-id="${
+            product.id
+          }">
             In den Warenkorb
           </button>
         </div>
@@ -109,7 +117,7 @@ function renderProducts(products) {
       type: "POST",
       data: {
         action: "addToCart",
-        productId: productId
+        productId: productId,
       },
       dataType: "json",
       success: function (response) {
@@ -121,16 +129,15 @@ function renderProducts(products) {
       },
       error: function (xhr, status, error) {
         console.error("AJAX-Fehler:", error);
-      }
+      },
     });
   });
 }
 
-
 // ========== LOGIN ==========
 function submitLogin() {
-  const loginCredentials = $('#loginCredentials').val();
-  const password = $('#password').val();
+  const loginCredentials = $("#loginCredentials").val();
+  const password = $("#password").val();
 
   if (!loginCredentials || !password) {
     alert("Bitte Benutzername und Passwort eingeben.");
@@ -143,7 +150,7 @@ function submitLogin() {
     data: {
       action: "login",
       loginCredentials: loginCredentials,
-      password: password
+      password: password,
     },
     success: function (response) {
       console.log(response);
@@ -157,15 +164,14 @@ function submitLogin() {
     error: function (xhr, status, error) {
       console.error("AJAX Fehler:", error);
       alert("Ein Fehler ist aufgetreten.");
-    }
+    },
   });
 }
 
-
 // ========== REGISTRIERUNG ==========
 function submitForm() {
-  const password = $('#password').val();
-  const password_repeat = $('#password_repeat').val();
+  const password = $("#password").val();
+  const password_repeat = $("#password_repeat").val();
 
   if (password !== password_repeat) {
     alert("Die Passwörter stimmen nicht überein.");
@@ -174,15 +180,15 @@ function submitForm() {
 
   const formData = {
     action: "register",
-    anrede: $('#anrede').val(),
-    vorname: $('#vorname').val(),
-    nachname: $('#nachname').val(),
-    adresse: $('#adresse').val(),
-    plz: $('#plz').val(),
-    ort: $('#ort').val(),
-    email: $('#email').val(),
-    username: $('#username').val(),
-    password: password
+    anrede: $("#anrede").val(),
+    vorname: $("#vorname").val(),
+    nachname: $("#nachname").val(),
+    adresse: $("#adresse").val(),
+    plz: $("#plz").val(),
+    ort: $("#ort").val(),
+    email: $("#email").val(),
+    username: $("#username").val(),
+    password: password,
   };
 
   $.ajax({
@@ -201,7 +207,7 @@ function submitForm() {
     error: function (xhr, status, error) {
       console.error("AJAX Fehler:", error);
       alert("Ein Fehler ist aufgetreten.");
-    }
+    },
   });
 }
 
@@ -220,10 +226,9 @@ function ladeWarenkorb() {
 
         if (Object.keys(cart).length === 0) {
           $container.html("<p>Dein Warenkorb ist leer.</p>");
-          $("#cart-count").text("0"); 
+          $("#cart-count").text("0");
           return;
         }
-        
 
         let gesamtpreis = 0;
 
@@ -236,7 +241,9 @@ function ladeWarenkorb() {
           const $card = $(`
             <div class="col-sm-6 col-md-4 col-lg-3">
               <div class="product-card warenkorb-card">
-                <img src="/Zeitwert/Backend/productpictures/${produkt.bild_url}" alt="${produkt.modell}">
+                <img src="/Zeitwert/Backend/productpictures/${
+                  produkt.bild_url
+                }" alt="${produkt.modell}">
                 <h3>${produkt.marke} – ${produkt.modell}</h3>
                 <p>Einzelpreis: € ${parseFloat(produkt.preis).toFixed(2)}</p>
                 <p>Gesamt: <strong>€ ${preis.toFixed(2)}</strong></p>
@@ -252,7 +259,11 @@ function ladeWarenkorb() {
           $container.append($card);
         });
 
-        $container.append(`<div class="col-12"><hr><h4>🧾 Gesamtbetrag: € ${gesamtpreis.toFixed(2)}</h4></div>`);
+        $container.append(
+          `<div class="col-12"><hr><h4>🧾 Gesamtbetrag: € ${gesamtpreis.toFixed(
+            2
+          )}</h4></div>`
+        );
 
         // 🛒 Symbol aktualisieren
         $("#cart-count").text(response.gesamtmenge);
@@ -260,11 +271,9 @@ function ladeWarenkorb() {
     },
     error: function (xhr, status, error) {
       console.error("Fehler beim Laden des Warenkorbs:", error);
-    }
+    },
   });
 }
-
-
 
 function entferneProdukt(productId) {
   $.ajax({
@@ -272,17 +281,16 @@ function entferneProdukt(productId) {
     type: "POST",
     data: {
       action: "removeFromCart",
-      productId: productId
+      productId: productId,
     },
     success: function () {
       ladeWarenkorb();
     },
     error: function (xhr, status, error) {
       console.error("Fehler beim Entfernen des Produkts:", error);
-    }
+    },
   });
 }
-
 
 function aktualisiereMenge(productId, menge) {
   $.ajax({
@@ -291,14 +299,14 @@ function aktualisiereMenge(productId, menge) {
     data: {
       action: "updateCartQuantity",
       productId: productId,
-      quantity: parseInt(menge)
+      quantity: parseInt(menge),
     },
     success: function () {
       ladeWarenkorb();
     },
     error: function (xhr, status, error) {
       console.error("Fehler beim Aktualisieren der Menge:", error);
-    }
+    },
   });
 }
 
@@ -312,10 +320,34 @@ function fetchCartCount() {
       if (res.success) {
         $("#cart-count").text(res.gesamtmenge);
       }
-    }
+    },
   });
 }
 
+// ========== PRODUKTE SUCHEN (CONTINIOUS SEARCH FILTER) ==========
+function applySearchFilter() {
+  const input = $('#searchFilter').val();
+
+  $.ajax({
+    url: "http://localhost/Zeitwert/Backend/logic/requestHandler.php",
+    type: "POST",
+    data: {
+      action: "searchProducts",
+      query: input
+    },
+    success: function (response) {
+      if (response.success) {
+        renderProducts(response.products);
+      } else {
+        renderProducts([]); // leere Liste anzeigen
+        $('#productContainer').text(response.message).show();
+      }
+    },
+    error: function (xhr, status, error) {
+      console.error("Fehler bei der Suche:", error);
+    }
+  });
+}
 
 
 

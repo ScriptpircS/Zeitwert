@@ -125,8 +125,21 @@ if ($action === 'login') {
     } else {
         $response['message'] = "Keine Kategorie-ID übergeben.";
     }
-}    
 
+// ==== PRODUKTE FILTERN ==================================================
+
+} elseif ($action === 'searchProducts') {
+    $query = $_POST['query'] ?? '';
+    $results = $productModel->searchProducts($query);
+
+    if(empty($results)) {
+        $response['success'] = false;
+        $response['message'] = "Keine passenden Produkte gefunden!";
+    } else {
+        $response['success'] = true;
+        $response['products'] = $results;
+    }
+}
 
 
 // ==== DEFAULT: UNBEKANNTE AKTION ========================================
