@@ -113,6 +113,12 @@ if ($action === 'login') {
             $totalQty = array_sum(array_column($_SESSION['cart'], 'qty'));
             $response = ['success' => true, 'cartCount' => $totalQty];
         }
+        else {
+            $response['message'] = "Produkt wurde nicht gefunden.";
+        }
+    } else {
+        $response['message'] = "Produkt-ID fehlt.";
+    
     }
 // ==== WARENKORB ANZEIGEN ===============================================
 
