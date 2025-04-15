@@ -6,7 +6,9 @@
     <a href="#" class="nav-link" id="registerLink">Registrieren</a>
     <a href="#" class="nav-link" id="loginLink">Login</a>
     <a href="#" class="nav-link d-flex align-items-center" id="Warenkorb">
-      🛒 <span id="cart-count" class="badge bg-primary ms-1">0</span>
+      <div id="dropzone-warenkorb" ondrop="handleDrop(event)" ondragover="handleDragOver(event)">
+      🛒 <span id="cart-count" class="badge bg-primary ms-1">0</span><br>
+    </div>
     </a>
     <a href="#" class="nav-link d-none" id="accountLink">Mein Konto</a>
     <a href="#" class="nav-link d-none" id="logoutLink">Logout</a>

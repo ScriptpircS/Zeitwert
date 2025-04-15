@@ -242,7 +242,7 @@ function ladeWarenkorb() {
 
           const $card = $(`
             <div class="col-sm-6 col-md-4 col-lg-3">
-              <div class="product-card warenkorb-card">
+              <div class="product-card warenkorb-card" draggable="true" data-id="${productId}">
                 <img src="/Zeitwert/Backend/productpictures/${
                   produkt.bild_url
                 }" alt="${produkt.modell}">
@@ -323,6 +323,49 @@ function fetchCartCount() {
         $("#cart-count").text(res.gesamtmenge);
       }
     },
+  });
+}
+
+
+// ========== DRAG & DROP WARENKORB ==========
+// Drag starten → ID übertragen
+$(document).on("dragstart", ".product-card", function (e) {
+  const productId = $(this).data("id");
+  e.originalEvent.dataTransfer.setData("productId", productId);
+});
+
+// Dragover erlauben
+function handleDragOver(event) {
+  event.preventDefault(); // wichtig!
+}
+
+// Beim Drop: ID holen und hinzufügen
+function handleDrop(event) {
+  event.preventDefault();
+
+  const productId = event.dataTransfer.getData("productId");
+  if (!productId) return;
+
+  // Per AJAX zum Warenkorb hinzufügen
+  $.ajax({
+    url: "http://localhost/Zeitwert/Backend/logic/requestHandler.php",
+    type: "POST",
+    data: {
+      action: "addToCart",
+      productId: productId
+    },
+    dataType: "json",
+    success: function (response) {
+      if (response.success) {
+        $("#cart-count").text(response.cartCount);
+        ladeWarenkorb(); // Warenkorb aktualisieren
+      } else {
+        alert("Fehler: " + response.message);
+      }
+    },
+    error: function (xhr, status, error) {
+      console.error("Drag-Drop Fehler:", error);
+    }
   });
 }
 
