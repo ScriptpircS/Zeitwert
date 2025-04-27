@@ -55,19 +55,31 @@ if ($action === 'login') {
     } else {
         $result = $userModel->getByEmailOrUsername($loginCredentials);
 
-        if (count($result) === 1 && password_verify($password, $result[0]['password_hash'])) {
-            $_SESSION["username"] = $result[0]['username'];
-            $_SESSION["role"] = $result[0]['role'];
+        if (count($result) === 1) {
             
-            if ($stayLoggedIn === "true" || $stayLoggedIn === true) {
-                setcookie("stayLoggedIn", $loginCredentials, [
-                    'expires' => time() + (86400 * 30),
-                    'path' => '/'
-                ]);
+            if ($result[0]['is_active'] == 'inactive') {
+                $response['success'] = false;
+                $response['message'] = "Dein Account ist deaktiviert. Bitte kontaktiere den Support.";
+            } 
+
+            elseif (password_verify($password, $result[0]['password_hash'])) {
+                $_SESSION["username"] = $result[0]['username'];
+                $_SESSION["role"] = $result[0]['role'];
+                
+                if ($stayLoggedIn === "true" || $stayLoggedIn === true) {
+                    setcookie("stayLoggedIn", $loginCredentials, [
+                        'expires' => time() + (86400 * 30),
+                        'path' => '/'
+                    ]);
+                }
+                $response['success'] = true;
+                $response['message'] = "Eingeloggt! Hallo " . $result[0]['username'];
+            } else {
+                $response['success'] = false;
+                $response['message'] = "Login fehlgeschlagen – Benutzer oder Passwort ungültig.";
             }
-            $response['success'] = true;
-            $response['message'] = "Eingeloggt! Hallo " . $result[0]['username'];
         } else {
+            $response['success'] = false;
             $response['message'] = "Login fehlgeschlagen – Benutzer oder Passwort ungültig.";
         }
     }
@@ -315,6 +327,33 @@ elseif ($action === 'deleteImage') {
         $response['message'] = "Produkt-ID fehlt.";
     }
 }
+
+// ==== KUNDEN VERWALTEN ===================================================
+
+// Kunden auflisten
+elseif ($action === 'listCustomers') {
+    $customers = $userModel->getAllCustomers();
+    $response['success'] = true;
+    $response['customers'] = $customers;
+}
+
+// Kundenstatus toggeln (aktiv/inaktiv)
+elseif ($action === 'toggleCustomer') {
+    $userId = $_POST['id'] ?? null;
+
+    if ($userId) {
+        $newStatus = $userModel->toggleCustomerStatus($userId);
+        if ($newStatus !== null) {
+            $response['success'] = true;
+            $response['message'] = $newStatus ? "Kunde aktiviert." : "Kunde deaktiviert.";
+        } else {
+            $response['message'] = "Kunde nicht gefunden.";
+        }
+    } else {
+        $response['message'] = "Kunden-ID fehlt.";
+    }
+}
+
 
 
 // ==== DEFAULT: UNBEKANNTE AKTION ========================================
