@@ -402,5 +402,4 @@ function showCreateForm() {
     $("#orderContainer").html(html);
   }
   
-}
 
