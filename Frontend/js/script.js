@@ -34,6 +34,9 @@ $(document).ready(function () {
 
   ladeWarenkorb();
   fetchCartCount();  
+  if ($("#adminProductForm").length > 0) {
+    fetchAdminProducts(); // Laden der Produkte nur für Admin-Seiten
+  }
   
 });
 
@@ -245,7 +248,7 @@ function ladeWarenkorb() {
               <div class="product-card warenkorb-card" draggable="true" data-id="${productId}">
                 <img src="/Zeitwert/Backend/productpictures/${
                   produkt.bild_url
-                }" alt="${produkt.modell}">
+                }" alt="${produkt.modell}" style="max-width:150px;">
                 <h3>${produkt.marke} – ${produkt.modell}</h3>
                 <p>Einzelpreis: € ${parseFloat(produkt.preis).toFixed(2)}</p>
                 <p>Gesamt: <strong>€ ${preis.toFixed(2)}</strong></p>
