@@ -7,6 +7,9 @@ session_start();
 require_once('../config/dbaccess.php');
 require_once('../models/product.class.php');
 require_once('../models/user.class.php');
+require_once('../models/coupon.class.php');
+$couponModel = new Coupon();
+
 
 $response = ['success' => false]; // Standardantwort
 $action = $_POST['action'] ?? '';
@@ -313,6 +316,48 @@ elseif ($action === 'deleteImage') {
         }
     } else {
         $response['message'] = "Produkt-ID fehlt.";
+    }
+}
+
+// ==== COUPONS ADMIN - CREATE ====
+elseif ($action === 'createCoupon') {
+    $wert = $_POST['wert'] ?? null;
+    $validUntil = $_POST['valid_until'] ?? null;
+
+    if ($wert !== null && $validUntil !== null) {
+        $newCode = $couponModel->createCoupon($wert, $validUntil);
+        if ($newCode) {
+            $response['success'] = true;
+            $response['message'] = "Gutschein erfolgreich erstellt: $newCode";
+        } else {
+            $response['message'] = "Fehler beim Erstellen des Gutscheins.";
+        }
+    } else {
+        $response['message'] = "Fehlende Eingaben.";
+    }
+}
+
+// ==== COUPONS ADMIN - LIST ====
+elseif ($action === 'listCoupons') {
+    $coupons = $couponModel->getAllCoupons();
+    $response['success'] = true;
+    $response['coupons'] = $coupons;
+}
+
+// ==== COUPONS ADMIN - DELETE ====
+elseif ($action === 'deleteCoupon') {
+    $couponId = $_POST['id'] ?? null;
+    if ($couponId) {
+        $sql = "DELETE FROM coupons WHERE id = :id";
+        $params = [':id' => $couponId];
+        if (dbaccess::getInstance()->execute($sql, $params)) {
+            $response['success'] = true;
+            $response['message'] = "Gutschein erfolgreich gelöscht.";
+        } else {
+            $response['message'] = "Fehler beim Löschen.";
+        }
+    } else {
+        $response['message'] = "Gutschein-ID fehlt.";
     }
 }
 
