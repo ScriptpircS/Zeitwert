@@ -25,6 +25,7 @@ if ($action === 'autoLogin') {
 
         if (count($result) === 1) {
             $_SESSION["username"] = $result[0]['username'];
+            $_SESSION["role"] = $result[0]['role'];
 
             // Setze den stayLoggedIn-Cookie im Backend
             setcookie("stayLoggedIn", $loginCredentials, [
@@ -56,6 +57,8 @@ if ($action === 'login') {
 
         if (count($result) === 1 && password_verify($password, $result[0]['password_hash'])) {
             $_SESSION["username"] = $result[0]['username'];
+            $_SESSION["role"] = $result[0]['role'];
+            
             if ($stayLoggedIn === "true" || $stayLoggedIn === true) {
                 setcookie("stayLoggedIn", $loginCredentials, [
                     'expires' => time() + (86400 * 30),
@@ -179,6 +182,137 @@ if ($action === 'login') {
     } else {
         $response['success'] = true;
         $response['products'] = $results;
+    }
+}
+
+// ==== PRODUKTE ADMIN - READ ====
+
+elseif ($action === 'listProducts') {
+    $products = $productModel->getAllProducts();
+    $response['success'] = true;
+    $response['products'] = $products;
+}
+
+elseif ($action === 'getProduct') {
+    $productId = $_POST['id'] ?? null;
+    if ($productId) {
+        $product = $productModel->getProductById($productId);
+        if ($product) {
+            $response['success'] = true;
+            $response['product'] = $product;
+        } else {
+            $response['message'] = "Produkt nicht gefunden.";
+        }
+    } else {
+        $response['message'] = "Produkt-ID fehlt.";
+    }
+}
+
+// ==== PRODUKTE ADMIN - CREATE ====
+
+elseif ($action === 'createProduct') {
+    $productData = [
+        'marke' => $_POST['marke'] ?? '',
+        'modell' => $_POST['modell'] ?? '',
+        'beschreibung' => $_POST['beschreibung'] ?? '',
+        'preis' => $_POST['preis'] ?? 0,
+    ];
+
+    $bild_url = null;
+    if (isset($_FILES['bild']) && $_FILES['bild']['error'] == 0) {
+        $allowed = ['jpg', 'jpeg', 'png', 'webp'];
+        $ext = strtolower(pathinfo($_FILES['bild']['name'], PATHINFO_EXTENSION));
+        if (in_array($ext, $allowed)) {
+       
+            $modell = isset($_POST['modell']) ? $_POST['modell'] : 'default';
+            $modell = preg_replace('/[^a-zA-Z0-9_-]/', '_', $modell); // nur sichere Zeichen
+            
+            $imageName = $modell . '.' . $ext;
+            $uploadPath = __DIR__ . '/../productpictures/' . $imageName;
+    
+            move_uploaded_file($_FILES['bild']['tmp_name'], $uploadPath);
+    
+            $bild_url = $imageName;
+        }
+    }
+    
+    $productData['bild_url'] = $bild_url;
+
+    if ($productModel->createProduct($productData)) {
+        $response['success'] = true;
+        $response['message'] = "Produkt erfolgreich erstellt.";
+    } else {
+        $response['message'] = "Fehler beim Erstellen.";
+    }
+}
+
+// ==== PRODUKTE ADMIN - UPDATE ====
+
+elseif ($action === 'updateProduct') {
+    $productData = [
+        'id' => $_POST['id'] ?? '',
+        'marke' => $_POST['marke'] ?? '',
+        'modell' => $_POST['modell'] ?? '',
+        'beschreibung' => $_POST['beschreibung'] ?? '',
+        'preis' => $_POST['preis'] ?? '',
+    ];
+
+    if (isset($_FILES['bild']) && $_FILES['bild']['error'] == 0) {
+        $allowed = ['jpg', 'jpeg', 'png', 'webp'];
+        $ext = strtolower(pathinfo($_FILES['bild']['name'], PATHINFO_EXTENSION));
+        if (in_array($ext, $allowed)) {
+            $modell = isset($_POST['modell']) ? $_POST['modell'] : 'default';
+            $modell = preg_replace('/[^a-zA-Z0-9_-]/', '_', $modell); // nur sichere Zeichen
+            
+            $imageName = $modell . '.' . $ext;
+            $uploadFolder = __DIR__ . '/../productpictures/';
+            move_uploaded_file($_FILES['bild']['tmp_name'], $uploadFolder . $imageName);
+            $productData['bild_url'] = $imageName;
+        }
+    }
+
+    if ($productModel->updateProduct($productData)) {
+        $response['success'] = true;
+        $response['message'] = "Produkt erfolgreich aktualisiert.";
+    } else {
+        $response['message'] = "Fehler beim Aktualisieren.";
+    }
+}
+
+// ==== PRODUKTE ADMIN - DELETE ====
+
+elseif ($action === 'deleteProduct') {
+    $productId = $_POST['id'] ?? null;
+    if ($productId && $productModel->deleteProduct($productId)) {
+        $response['success'] = true;
+        $response['message'] = "Produkt erfolgreich gelöscht.";
+    } else {
+        $response['message'] = "Fehler beim Löschen.";
+    }
+}
+
+elseif ($action === 'deleteImage') {
+    $productId = $_POST['id'] ?? null;
+    if ($productId) {
+        $product = $productModel->getProductById($productId);
+        if ($product && !empty($product['bild_url'])) {
+            $filePath = __DIR__ . '/../productpictures/' . $product['bild_url'];
+            if (file_exists($filePath)) {
+                unlink($filePath);
+                if ($productModel->deleteProductImage($productId)) {
+                    $response['success'] = true;
+                    $response['message'] = "Bild erfolgreich gelöscht.";
+                } else {
+                    $response['message'] = "Fehler beim Löschen aus DB.";
+                }
+            } else {
+                $response['message'] = "Bilddatei existiert nicht.";
+            }
+        } else {
+            $response['message'] = "Produkt oder Bild nicht gefunden.";
+        }
+    } else {
+        $response['message'] = "Produkt-ID fehlt.";
     }
 }
 

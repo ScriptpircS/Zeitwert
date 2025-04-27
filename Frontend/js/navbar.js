@@ -1,6 +1,19 @@
+function getPrefix() {
+    const path = window.location.pathname;
+
+    if (path.includes("/Frontend/sites/admin/")) {
+        return "../../../";
+    } else if (path.includes("/Frontend/sites/")) {
+        return "../../";
+    } else {
+        return "";
+    }
+}
+
+
 function loadNavbar() {
-    const isDeep = window.location.pathname.includes("/Frontend/sites/");
-    const basePath = isDeep ? "../../Frontend/sites/navbar.html" : "Frontend/sites/navbar.html";
+    const prefix = getPrefix();
+    const basePath = prefix + "Frontend/sites/navbar.html";
 
     fetch(basePath)
         .then(res => res.text())
@@ -9,19 +22,14 @@ function loadNavbar() {
             navbarContainer.innerHTML = html;
             document.body.insertBefore(navbarContainer, document.body.firstChild);
 
-            fixNavbarLinks(isDeep);
-            /*
-            handleUserSession(isDeep);
-            */            
+            fixNavbarLinks(prefix);
             checkAutoLogin().then(() => {
-                handleUserSession(isDeep);
+                handleUserSession(prefix);
             });
         });
 }
 
-function fixNavbarLinks(isDeep) {
-    const prefix = isDeep ? "../../" : "";
-
+function fixNavbarLinks(prefix) {
     const linkMap = {
         "Zeitwert": "index.html",
         "loginLink": "Frontend/sites/login.html",
@@ -33,11 +41,9 @@ function fixNavbarLinks(isDeep) {
         "adminCouponsLink": "Frontend/sites/admin/coupons.html"
     };
 
-    // Hauptlink "Zeitwert" → Branding-Link (optional)
     const brand = document.querySelector(".navbar-brand");
     if (brand) brand.setAttribute("href", prefix + linkMap["Zeitwert"]);
 
-    // Alle Nav-Links dynamisch setzen
     for (const [id, path] of Object.entries(linkMap)) {
         const el = document.getElementById(id);
         if (el) {
@@ -46,8 +52,8 @@ function fixNavbarLinks(isDeep) {
     }
 }
 
-function handleUserSession(isDeep) {
-    const sessionPath = isDeep ? "../../Backend/logic/getUserSession.php" : "Backend/logic/getUserSession.php";
+function handleUserSession(prefix) {
+    const sessionPath = prefix + "Backend/logic/getUserSession.php";
 
     fetch(sessionPath)
         .then(res => res.json())
@@ -67,17 +73,17 @@ function handleUserSession(isDeep) {
             }
         });
 
-    // Logout-Handler
     document.addEventListener("click", function (e) {
         if (e.target.id === "logoutLink") {
             e.preventDefault();
-            const logoutPath = isDeep ? "../../Backend/logic/logout.php" : "Backend/logic/logout.php";
+            const logoutPath = prefix + "Backend/logic/logout.php";
 
             fetch(logoutPath)
-                .then(() => window.location.href = isDeep ? "../../Frontend/sites/login.html" : "Frontend/sites/login.html");
+                .then(() => window.location.href = prefix + "Frontend/sites/login.html");
         }
     });
 }
+
 // Hilfsfunktion, Prüft gespeicherte Cookies
 function getCookieValue(name) {
     const cookies = document.cookie.split(';');
