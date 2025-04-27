@@ -1,6 +1,7 @@
 $(document).ready(function() {
   $('#btnCreate').click(showCreateForm);
   $('#btnRUD').click(fetchAdminProducts); 
+  loadCustomers();
 });
 
 // ==== PRODUKTE ADMIN - CREATE ====
@@ -167,3 +168,123 @@ function deleteProduct(id) {
       });
   }
 }
+
+// ==== USER ADMIN ====
+  
+  // Kunden laden
+  function loadCustomers() {
+    $.ajax({
+      url: "http://localhost/Zeitwert/Backend/logic/requestHandler.php",
+      type: "POST",
+      data: { action: "listCustomers" },
+      dataType: "json",
+      success: function (response) {
+        if (response.success) {
+          renderCustomers(response.customers);
+        } else {
+          $("#customerContainer").html('<p> Keine Kunden gefunden.</p>');
+        }
+      },
+      error: function () {
+        $("#customerContainer").html('<p> Fehler beim Laden der Kunden.</p>');
+      }
+    });
+  }
+  
+  // Kundenliste anzeigen
+  function renderCustomers(customers) {
+    const $container = $("#customerContainer");
+    $container.empty();
+  
+    customers.forEach(c => {
+      const activeBadge = c.is_active === 'active' ? 
+        '<span class="badge bg-success">Aktiv</span>' : 
+        '<span class="badge bg-danger">Deaktiviert</span>';
+  
+      const $card = $(`
+        <div class="card mb-3">
+          <div class="card-body">
+            <h5>${c.vorname} ${c.nachname} (${c.username}) ${activeBadge}</h5>
+            <p><strong>Email:</strong> ${c.email}</p>
+            <p><strong>Ort:</strong> ${c.ort}</p>
+  
+            <button class="btn btn-primary btn-sm me-2" onclick="viewOrders(${c.id})">
+              Bestellungen ansehen
+            </button>
+  
+            <button class="btn btn-warning btn-sm" onclick="toggleActivation(${c.id}, '${c.is_active}')">
+              ${c.is_active == 'active' ? 'Deaktivieren' : 'Aktivieren'}
+            </button>
+          </div>
+        </div>
+      `);
+  
+      $container.append($card);
+    });
+  }
+  
+
+  
+  
+  // Kunden aktivieren/deaktivieren
+  function toggleActivation(customerId, currentStatus) {
+    const actionText = currentStatus === 'active' ? "deaktivieren" : "aktivieren";
+    if (confirm(`Willst du den Kunden wirklich ${actionText}?`)) {
+      $.ajax({
+        url: "http://localhost/Zeitwert/Backend/logic/requestHandler.php",
+        type: "POST",
+        data: { action: "toggleCustomer", id: customerId },
+        dataType: "json",
+        success: function (response) {
+          alert(response.message);
+          loadCustomers();
+        },
+        error: function () {
+          alert(" Fehler beim Ändern des Status.");
+        }
+      });
+    }
+  }
+  
+  // Bestellungen eines Kunden anzeigen
+  function viewOrders(customerId) {
+    $.ajax({
+      url: "http://localhost/Zeitwert/Backend/logic/requestHandler.php",
+      type: "POST",
+      data: { action: "getCustomerOrders", userId: customerId },
+      dataType: "json",
+      success: function (response) {
+        if (response.success) {
+          showOrders(response.orders);
+        } else {
+          alert("Keine Bestellungen gefunden.");
+        }
+      },
+      error: function () {
+        alert("Fehler beim Laden der Bestellungen.");
+      }
+    });
+  }
+  
+  // Bestellungen darstellen
+  function showOrders(orders) {
+    let html = '<h4>Bestellungen</h4>';
+    if (orders.length === 0) {
+      html += '<p>Keine Bestellungen vorhanden.</p>';
+    } else {
+      html += '<ul class="list-group">';
+      orders.forEach(o => {
+        html += `
+          <li class="list-group-item">
+            <strong>Bestellnr.:</strong> ${o.id} |
+            <strong>Datum:</strong> ${o.order_date} |
+            <strong>Summe:</strong> €${parseFloat(o.total_price).toFixed(2)} |
+            <strong>Status:</strong> ${o.status}
+          </li>
+        `;
+      });
+      html += '</ul>';
+    }
+    $("#orderContainer").html(html);
+  }
+  

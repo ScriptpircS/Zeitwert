@@ -50,4 +50,30 @@ class User {
         $result = $this->db->select($sql, [$email]);
         return $result[0]['anzahl'] > 0;
     }
+    // === Alle Kunden holen (nur CUSTOMER)
+    public function getAllCustomers() {
+        $sql = "SELECT * FROM users WHERE role = 'customer' ORDER BY created_at DESC";
+        return $this->db->select($sql);
+    }
+
+    // === Kunden aktivieren/deaktivieren
+    public function toggleCustomerStatus($userId) {
+        // Aktuellen Status holen
+        $sqlSelect = "SELECT is_active FROM users WHERE id = ?";
+        $current = $this->db->select($sqlSelect, [$userId]);
+    
+        if (count($current) === 1) {
+            $currentStatus = $current[0]['is_active']; // 'active' oder 'inactive'
+            $newStatus = ($currentStatus === 'active') ? 'inactive' : 'active';
+    
+            $sqlUpdate = "UPDATE users SET is_active = ? WHERE id = ?";
+            $this->db->execute($sqlUpdate, [$newStatus, $userId]);
+    
+            return $newStatus; // 'active' oder 'inactive'
+        }
+    
+        return null; // Benutzer nicht gefunden
+    }
+    
 }
+?>
