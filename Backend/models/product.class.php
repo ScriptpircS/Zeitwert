@@ -35,6 +35,31 @@ class Product {
         $likeQuery = '%' . strtolower($query) . '%';
         return $this->db->select($sql, [$likeQuery, $likeQuery, $likeQuery]);
     }
+
+    public function createProduct($data) {
+        $sql = "INSERT INTO products (marke, modell, beschreibung, preis, bild_url) 
+                VALUES (:marke, :modell, :beschreibung, :preis, :bild_url)";
+        return $this->db->execute($sql, $data);
+    }
+
+    public function updateProduct($data) {
+        $set = "marke = :marke, modell = :modell, beschreibung = :beschreibung, preis = :preis";
+        if (isset($data['bild_url'])) {
+            $set .= ", bild_url = :bild_url";
+        }
+        $sql = "UPDATE products SET $set WHERE id = :id";
+        return $this->db->execute($sql, $data);
+    }
+
+    public function deleteProduct($id) {
+        $sql = "DELETE FROM products WHERE id = ?";
+        return $this->db->execute($sql, [$id]);
+    }
+
+    public function deleteProductImage($id) {
+        $sql = "UPDATE products SET bild_url = NULL WHERE id = ?";
+        return $this->db->execute($sql, [$id]);
+    }
     
     
 }

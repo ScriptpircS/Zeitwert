@@ -7,6 +7,9 @@ session_start();
 require_once('../config/dbaccess.php');
 require_once('../models/product.class.php');
 require_once('../models/user.class.php');
+require_once('../models/coupon.class.php');
+$couponModel = new Coupon();
+
 
 $response = ['success' => false]; // Standardantwort
 $action = $_POST['action'] ?? '';
@@ -25,6 +28,7 @@ if ($action === 'autoLogin') {
 
         if (count($result) === 1) {
             $_SESSION["username"] = $result[0]['username'];
+            $_SESSION["role"] = $result[0]['role'];
 
             // Setze den stayLoggedIn-Cookie im Backend
             setcookie("stayLoggedIn", $loginCredentials, [
@@ -54,17 +58,31 @@ if ($action === 'login') {
     } else {
         $result = $userModel->getByEmailOrUsername($loginCredentials);
 
-        if (count($result) === 1 && password_verify($password, $result[0]['password_hash'])) {
-            $_SESSION["username"] = $result[0]['username'];
-            if ($stayLoggedIn === "true" || $stayLoggedIn === true) {
-                setcookie("stayLoggedIn", $loginCredentials, [
-                    'expires' => time() + (86400 * 30),
-                    'path' => '/'
-                ]);
+        if (count($result) === 1) {
+            
+            if ($result[0]['is_active'] == 'inactive') {
+                $response['success'] = false;
+                $response['message'] = "Dein Account ist deaktiviert. Bitte kontaktiere den Support.";
+            } 
+
+            elseif (password_verify($password, $result[0]['password_hash'])) {
+                $_SESSION["username"] = $result[0]['username'];
+                $_SESSION["role"] = $result[0]['role'];
+                
+                if ($stayLoggedIn === "true" || $stayLoggedIn === true) {
+                    setcookie("stayLoggedIn", $loginCredentials, [
+                        'expires' => time() + (86400 * 30),
+                        'path' => '/'
+                    ]);
+                }
+                $response['success'] = true;
+                $response['message'] = "Eingeloggt! Hallo " . $result[0]['username'];
+            } else {
+                $response['success'] = false;
+                $response['message'] = "Login fehlgeschlagen – Benutzer oder Passwort ungültig.";
             }
-            $response['success'] = true;
-            $response['message'] = "Eingeloggt! Hallo " . $result[0]['username'];
         } else {
+            $response['success'] = false;
             $response['message'] = "Login fehlgeschlagen – Benutzer oder Passwort ungültig.";
         }
     }
@@ -181,6 +199,208 @@ if ($action === 'login') {
         $response['products'] = $results;
     }
 }
+
+// ==== PRODUKTE ADMIN - READ ====
+
+elseif ($action === 'listProducts') {
+    $products = $productModel->getAllProducts();
+    $response['success'] = true;
+    $response['products'] = $products;
+}
+
+elseif ($action === 'getProduct') {
+    $productId = $_POST['id'] ?? null;
+    if ($productId) {
+        $product = $productModel->getProductById($productId);
+        if ($product) {
+            $response['success'] = true;
+            $response['product'] = $product;
+        } else {
+            $response['message'] = "Produkt nicht gefunden.";
+        }
+    } else {
+        $response['message'] = "Produkt-ID fehlt.";
+    }
+}
+
+// ==== PRODUKTE ADMIN - CREATE ====
+
+elseif ($action === 'createProduct') {
+    $productData = [
+        'marke' => $_POST['marke'] ?? '',
+        'modell' => $_POST['modell'] ?? '',
+        'beschreibung' => $_POST['beschreibung'] ?? '',
+        'preis' => $_POST['preis'] ?? 0,
+    ];
+
+    $bild_url = null;
+    if (isset($_FILES['bild']) && $_FILES['bild']['error'] == 0) {
+        $allowed = ['jpg', 'jpeg', 'png', 'webp'];
+        $ext = strtolower(pathinfo($_FILES['bild']['name'], PATHINFO_EXTENSION));
+        if (in_array($ext, $allowed)) {
+       
+            $modell = isset($_POST['modell']) ? $_POST['modell'] : 'default';
+            $modell = preg_replace('/[^a-zA-Z0-9_-]/', '_', $modell); // nur sichere Zeichen
+            
+            $imageName = $modell . '.' . $ext;
+            $uploadPath = __DIR__ . '/../productpictures/' . $imageName;
+    
+            move_uploaded_file($_FILES['bild']['tmp_name'], $uploadPath);
+    
+            $bild_url = $imageName;
+        }
+    }
+    
+    $productData['bild_url'] = $bild_url;
+
+    if ($productModel->createProduct($productData)) {
+        $response['success'] = true;
+        $response['message'] = "Produkt erfolgreich erstellt.";
+    } else {
+        $response['message'] = "Fehler beim Erstellen.";
+    }
+}
+
+// ==== PRODUKTE ADMIN - UPDATE ====
+
+elseif ($action === 'updateProduct') {
+    $productData = [
+        'id' => $_POST['id'] ?? '',
+        'marke' => $_POST['marke'] ?? '',
+        'modell' => $_POST['modell'] ?? '',
+        'beschreibung' => $_POST['beschreibung'] ?? '',
+        'preis' => $_POST['preis'] ?? '',
+    ];
+
+    if (isset($_FILES['bild']) && $_FILES['bild']['error'] == 0) {
+        $allowed = ['jpg', 'jpeg', 'png', 'webp'];
+        $ext = strtolower(pathinfo($_FILES['bild']['name'], PATHINFO_EXTENSION));
+        if (in_array($ext, $allowed)) {
+            $modell = isset($_POST['modell']) ? $_POST['modell'] : 'default';
+            $modell = preg_replace('/[^a-zA-Z0-9_-]/', '_', $modell); // nur sichere Zeichen
+            
+            $imageName = $modell . '.' . $ext;
+            $uploadFolder = __DIR__ . '/../productpictures/';
+            move_uploaded_file($_FILES['bild']['tmp_name'], $uploadFolder . $imageName);
+            $productData['bild_url'] = $imageName;
+        }
+    }
+
+    if ($productModel->updateProduct($productData)) {
+        $response['success'] = true;
+        $response['message'] = "Produkt erfolgreich aktualisiert.";
+    } else {
+        $response['message'] = "Fehler beim Aktualisieren.";
+    }
+}
+
+// ==== PRODUKTE ADMIN - DELETE ====
+
+elseif ($action === 'deleteProduct') {
+    $productId = $_POST['id'] ?? null;
+    if ($productId && $productModel->deleteProduct($productId)) {
+        $response['success'] = true;
+        $response['message'] = "Produkt erfolgreich gelöscht.";
+    } else {
+        $response['message'] = "Fehler beim Löschen.";
+    }
+}
+
+elseif ($action === 'deleteImage') {
+    $productId = $_POST['id'] ?? null;
+    if ($productId) {
+        $product = $productModel->getProductById($productId);
+        if ($product && !empty($product['bild_url'])) {
+            $filePath = __DIR__ . '/../productpictures/' . $product['bild_url'];
+            if (file_exists($filePath)) {
+                unlink($filePath);
+                if ($productModel->deleteProductImage($productId)) {
+                    $response['success'] = true;
+                    $response['message'] = "Bild erfolgreich gelöscht.";
+                } else {
+                    $response['message'] = "Fehler beim Löschen aus DB.";
+                }
+            } else {
+                $response['message'] = "Bilddatei existiert nicht.";
+            }
+        } else {
+            $response['message'] = "Produkt oder Bild nicht gefunden.";
+        }
+    } else {
+        $response['message'] = "Produkt-ID fehlt.";
+    }
+}
+
+
+// ==== COUPONS ADMIN - CREATE ====
+elseif ($action === 'createCoupon') {
+    $wert = $_POST['wert'] ?? null;
+    $validUntil = $_POST['valid_until'] ?? null;
+
+    if ($wert !== null && $validUntil !== null) {
+        $newCode = $couponModel->createCoupon($wert, $validUntil);
+        if ($newCode) {
+            $response['success'] = true;
+            $response['message'] = "Gutschein erfolgreich erstellt: $newCode";
+        } else {
+            $response['message'] = "Fehler beim Erstellen des Gutscheins.";
+        }
+    } else {
+        $response['message'] = "Fehlende Eingaben.";
+    }
+}
+
+// ==== COUPONS ADMIN - LIST ====
+elseif ($action === 'listCoupons') {
+    $coupons = $couponModel->getAllCoupons();
+    $response['success'] = true;
+    $response['coupons'] = $coupons;
+}
+
+// ==== COUPONS ADMIN - DELETE ====
+elseif ($action === 'deleteCoupon') {
+    $couponId = $_POST['id'] ?? null;
+    if ($couponId) {
+        $sql = "DELETE FROM coupons WHERE id = :id";
+        $params = [':id' => $couponId];
+        if (dbaccess::getInstance()->execute($sql, $params)) {
+            $response['success'] = true;
+            $response['message'] = "Gutschein erfolgreich gelöscht.";
+        } else {
+            $response['message'] = "Fehler beim Löschen.";
+        }
+    } else {
+        $response['message'] = "Gutschein-ID fehlt.";
+    }
+}
+
+
+// ==== KUNDEN VERWALTEN ===================================================
+
+// Kunden auflisten
+elseif ($action === 'listCustomers') {
+    $customers = $userModel->getAllCustomers();
+    $response['success'] = true;
+    $response['customers'] = $customers;
+}
+
+// Kundenstatus toggeln (aktiv/inaktiv)
+elseif ($action === 'toggleCustomer') {
+    $userId = $_POST['id'] ?? null;
+
+    if ($userId) {
+        $newStatus = $userModel->toggleCustomerStatus($userId);
+        if ($newStatus !== null) {
+            $response['success'] = true;
+            $response['message'] = $newStatus ? "Kunde aktiviert." : "Kunde deaktiviert.";
+        } else {
+            $response['message'] = "Kunde nicht gefunden.";
+        }
+    } else {
+        $response['message'] = "Kunden-ID fehlt.";
+    }
+}
+
 
 
 // ==== DEFAULT: UNBEKANNTE AKTION ========================================
