@@ -397,5 +397,163 @@ function applySearchFilter() {
   });
 }
 
+// ========== SEITENLADUNG CHECKOUT ==========
 
+// Checkout-spezifische Aktionen nach DOM-Ready
+$(document).ready(function () {
+  
+  if ($("#checkoutCartSummary").length > 0) {
+    checkLoginStatusAndLoadCheckout();
+  }
+
+});
+
+// 1. Login prüfen und dann Warenkorb + Benutzerdaten laden
+function checkLoginStatusAndLoadCheckout() {
+  $.ajax({
+    url: "http://localhost/Zeitwert/Backend/logic/getUserSession.php",
+    type: "POST",
+    dataType: "json",
+    success: function (response) {
+      if (response.loggedIn) {
+        // User eingeloggt: Warenkorb und Benutzerdaten laden
+        ladeCheckoutWarenkorb();
+        ladeNutzerdaten();
+      } else {
+        alert("Bitte melde dich zuerst an, um eine Bestellung abzuschließen.");
+        window.location.href = "../../index.html"; // Weiterleitung zur Startseite
+      }
+    },
+    error: function (xhr, status, error) {
+      console.error("Fehler bei Login-Check:", error);
+      window.location.href = "../../index.html"; // Sicherheitshalber weiterleiten
+    }
+  });
+}
+
+// 2. Warenkorb für Checkout laden
+function ladeCheckoutWarenkorb() {
+  $.ajax({
+    url: "http://localhost/Zeitwert/Backend/logic/requestHandler.php",
+    type: "POST",
+    data: { action: "getCart" },
+    dataType: "json",
+    success: function (response) {
+      if (response.success) {
+        const cart = response.cart;
+        const $ul = $("#checkoutCartSummary");
+        $ul.empty();
+
+        if (Object.keys(cart).length === 0) {
+          $("#checkoutPrice").text("Keine Produkte im Warenkorb.");
+        } else {
+          $.each(cart, function (productId, item) {
+            const produkt = item.product;
+            const menge = item.qty;
+
+            const $li = $(`
+              <li>${menge}x ${produkt.marke} - ${produkt.modell} (€ ${produkt.preis})</li>
+            `);
+            $ul.append($li);
+          });
+          $("#checkoutPrice").html("Gesamtpreis: € " + response.gesamtpreis);
+        }
+
+      } else {
+        alert("Fehler beim Laden des Warenkorbs.");
+      }
+    },
+    error: function (xhr, status, error) {
+      console.error("Fehler beim Laden des Checkout-Warenkorbs:", error);
+    }
+  });
+}
+
+// 3. Kundendaten laden und Formularfelder vorausfüllen
+function ladeNutzerdaten() {
+  $.ajax({
+    url: "http://localhost/Zeitwert/Backend/logic/requestHandler.php",
+    type: "POST",
+    data: { action: "getUserData" },
+    dataType: "json",
+    success: function (response) {
+      if (response.success && response.user) {
+        const user = response.user;
+
+        $("#anrede").val(user.anrede);
+        $("#firstname").val(user.vorname);
+        $("#lastname").val(user.nachname);
+        $("#street").val(user.adresse);
+        $("#plz").val(user.plz);
+        $("#ort").val(user.ort);
+        //Country falls in DB erweitert
+        //Zahlungsmethode könnte eingefüllt werden
+        //$("#country").val(user.land || "Austria"); // optionales Feld "land"
+        $("#payment_method").val(user.zahlungsinfo);
+      } else {
+        console.warn("Kundendaten konnten nicht geladen werden.");
+      }
+    },
+    error: function (xhr, status, error) {
+      console.error("Fehler beim Laden der Kundendaten:", error);
+    }
+  });
+}
+
+// 4. Checkout absenden
+$("#checkoutForm").on("submit", function (e) {
+  e.preventDefault();
+
+  if (!validateCheckoutForm()) {
+    return; // Bei Fehler abbrechen
+  }
+
+  // Wenn alles passt → Bestellung abschicken (z.B. per Ajax an Backend)
+  const bestellDaten = {
+    action: "placeOrder",
+    firstname: $("#firstname").val(),
+    lastname: $("#lastname").val(),
+    street: $("#street").val(),
+    plz: $("#plz").val(),
+    ort: $("#ort").val(),
+    country: $("#country").val(),
+    payment_method: $("#payment_method").val()
+    //payment_method: $("input[name='payment_method']:checked").val()
+  };
+
+  $.ajax({
+    url: "http://localhost/Zeitwert/Backend/logic/requestHandler.php",
+    type: "POST",
+    data: bestellDaten,
+    dataType: "json",
+    success: function (response) {
+      if (response.success) {
+        alert("Bestellung erfolgreich!");
+        $('#checkoutBody').html("<h1>Bestellung aufgegeben!</h1>");
+      } else {
+        alert("Fehler beim Abschließen der Bestellung: " + response.message);
+      }
+    },
+    error: function (xhr, status, error) {
+      console.error("Fehler beim Abschicken der Bestellung:", error);
+    }
+  });
+});
+
+// 5. Form Validierung
+function validateCheckoutForm() {
+  const firstname = $("#firstname").val();
+  const lastname = $("#lastname").val();
+  const street = $("#street").val();
+  const plz = $("#plz").val();
+  const ort = $("#ort").val();
+  const payment_method = $("#payment_method").val();
+  //const payment_method = $("input[name='payment_method']:checked").val();
+
+  if (!firstname || !lastname || !street || !plz || !ort || !payment_method) {
+    alert("Bitte fülle alle erforderlichen Felder aus und wähle eine Zahlungsmethode.");
+    return false;
+  }
+  return true;
+}
 

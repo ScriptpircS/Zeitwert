@@ -401,6 +401,98 @@ elseif ($action === 'toggleCustomer') {
     }
 }
 
+// ==== KUNDENDATEN IN BESTELLFORMULAR EINFÜLLEN ==========================
+elseif ($action === 'getUserData') {
+    if (isset($_SESSION['username'])) {
+        $username = $_SESSION['username'];
+        $userData = $userModel->getByEmailOrUsername($username);
+
+        if (count($userData) === 1) {
+            $response['success'] = true;
+            $response['user'] = [
+                'anrede' => $userData[0]['anrede'],
+                'vorname' => $userData[0]['vorname'],
+                'nachname' => $userData[0]['nachname'],
+                'adresse' => $userData[0]['adresse'],
+                'plz' => $userData[0]['plz'],
+                'ort' => $userData[0]['ort'],
+                'zahlungsinfo' => $userData[0]['zahlungsinfo'],
+            ];
+        } else {
+            $response['message'] = "Benutzerdaten konnten nicht gefunden werden.";
+        }
+    } else {
+        $response['message'] = "Nicht eingeloggt.";
+    }
+}
+
+// ==== BESTELLUNG ABSENDEN ===============================================
+elseif ($action === 'placeOrder') {
+    if (!isset($_SESSION['username'])) {
+        $response['message'] = "Du musst eingeloggt sein, um eine Bestellung aufzugeben.";
+    } elseif (empty($_SESSION['cart'])) {
+        $response['message'] = "Dein Warenkorb ist leer.";
+    } else {
+        try {
+            $db = dbaccess::getInstance();
+
+            // Kundendaten abrufen
+            $username = $_SESSION['username'];
+            $userResult = $userModel->getByEmailOrUsername($username);
+
+            if (count($userResult) !== 1) {
+                throw new Exception("Benutzerdaten konnten nicht geladen werden.");
+            }
+
+            $user = $userResult[0];
+            $userId = $user['id']; // Hier nehmen wir an: Tabelle user hat 'id'-Feld
+
+            // Gesamtsumme berechnen
+            $cart = $_SESSION['cart'];
+            $totalAmount = 0;
+
+            foreach ($cart as $item) {
+                $totalAmount += $item['product']['preis'] * $item['qty'];
+            }
+
+            // 1. Bestellung in "orders" speichern
+            $sqlOrder = "INSERT INTO orders (user_id, total_price, order_date, status) VALUES (:user_id, :total_price, NOW(), :status)";
+            $paramsOrder = [
+                ':user_id' => $userId,
+                ':total_price' => $totalAmount,
+                ':status' => 'ordered'
+            ];
+
+            if (!$db->execute($sqlOrder, $paramsOrder)) {
+                throw new Exception("Bestellung konnte nicht gespeichert werden.");
+            }
+
+            $orderId = $db->getLastInsertId();
+
+            // 2. Bestellte Produkte in "order_items" speichern
+            foreach ($cart as $productId => $item) {
+                $sqlItem = "INSERT INTO order_items (order_id, product_id, menge, preis) 
+                            VALUES (:order_id, :product_id, :quantity, :price_per_item)";
+                $paramsItem = [
+                    ':order_id' => $orderId,
+                    ':product_id' => $productId,
+                    ':quantity' => $item['qty'],
+                    ':price_per_item' => $item['product']['preis']
+                ];
+                $db->execute($sqlItem, $paramsItem);
+            }
+
+            // Bestellung abgeschlossen -> Warenkorb leeren
+            unset($_SESSION['cart']);
+
+            $response['success'] = true;
+            $response['message'] = "Bestellung erfolgreich aufgegeben. Vielen Dank!";
+        } catch (Exception $e) {
+            $response['message'] = "Fehler bei der Bestellung: " . $e->getMessage();
+        }
+    }
+}
+
 
 
 // ==== DEFAULT: UNBEKANNTE AKTION ========================================
