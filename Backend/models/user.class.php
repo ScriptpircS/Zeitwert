@@ -50,4 +50,31 @@ class User {
         $result = $this->db->select($sql, [$email]);
         return $result[0]['anzahl'] > 0;
     }
+
+    // Benutzerdaten updaten
+    public function updateUserData($username, $data) {
+        $allowedFields = ['vorname', 'nachname', 'adresse', 'ort', 'plz', 'anrede', 'zahlungsinfo', 'password_hash'];
+        $fieldsToUpdate = [];
+    
+        foreach ($allowedFields as $field) {
+            if (array_key_exists($field, $data)) {
+                $fieldsToUpdate[$field] = $data[$field];
+            }
+        }
+    
+        if (empty($fieldsToUpdate)) return false;
+    
+        $sets = [];
+        $params = [':username' => $username];
+        foreach ($fieldsToUpdate as $field => $value) {
+            $sets[] = "$field = :$field";
+            $params[":$field"] = $value;
+        }
+    
+        $setString = implode(', ', $sets);
+        $sql = "UPDATE users SET $setString WHERE username = :username";
+    
+        return $this->db->execute($sql, $params);
+    }
+        
 }
