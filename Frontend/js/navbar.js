@@ -36,6 +36,7 @@ function fixNavbarLinks(prefix) {
         "registerLink": "Frontend/sites/Register.html",
         "Warenkorb": "Frontend/sites/cart.html",
         "accountLink": "Frontend/sites/account.html",
+        "orderHistoryLink": "Frontend/sites/orderHistory.html",
         "adminProductsLink": "Frontend/sites/admin/products.html",
         "adminCustomersLink": "Frontend/sites/admin/customers.html",
         "adminCouponsLink": "Frontend/sites/admin/coupons.html"
@@ -64,6 +65,7 @@ function handleUserSession(prefix) {
                 $("#registerLink").addClass("d-none");
                 $("#logoutLink").removeClass("d-none");
                 $("#accountLink").removeClass("d-none");
+                $("#orderHistoryLink").removeClass("d-none");
 
                 if (data.role === "admin") {
                     $("#adminProductsLink").removeClass("d-none");

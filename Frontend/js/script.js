@@ -26,18 +26,25 @@ $(document).ready(function () {
       fetchProducts();
     }
   });
-  
+
   // Live-Suche
   $('#searchFilter').on('input', function () {
     applySearchFilter();
   });
 
   ladeWarenkorb();
-  fetchCartCount();  
+  fetchCartCount();
   if ($("#adminProductForm").length > 0) {
     fetchAdminProducts(); // Laden der Produkte nur für Admin-Seiten
   }
-  
+
+  // Checkout laden
+  if ($("#checkoutCartSummary").length > 0) {
+    checkLoginStatusAndLoadCheckout();
+  }
+
+  //Bestellhistorie
+  loadOrders();
 });
 
 // ========== PRODUKTE LADEN ==========
@@ -94,15 +101,13 @@ function renderProducts(products) {
     const $card = $(`
       <div class="col-sm-6 col-md-4 col-lg-3">
         <div class="product-card" draggable="true" data-id="${product.id}">
-          <img src="/Zeitwert/Backend/productpictures/${
-            product.bild_url
-          }" alt="${product.modell}">
+          <img src="/Zeitwert/Backend/productpictures/${product.bild_url
+      }" alt="${product.modell}">
           <h3>${product.marke} – ${product.modell}</h3>
           <p><strong>€ ${parseFloat(product.preis || 0).toFixed(2)}</strong></p>
           <p class="stars">${stars}</p>
-          <button class="btn btn-primary add-to-cart-btn" data-id="${
-            product.id
-          }">
+          <button class="btn btn-primary add-to-cart-btn" data-id="${product.id
+      }">
             In den Warenkorb
           </button>
         </div>
@@ -246,9 +251,8 @@ function ladeWarenkorb() {
           const $card = $(`
             <div class="col-sm-6 col-md-4 col-lg-3">
               <div class="product-card warenkorb-card" draggable="true" data-id="${productId}">
-                <img src="/Zeitwert/Backend/productpictures/${
-                  produkt.bild_url
-                }" alt="${produkt.modell}" style="max-width:150px;">
+                <img src="/Zeitwert/Backend/productpictures/${produkt.bild_url
+            }" alt="${produkt.modell}" style="max-width:150px;">
                 <h3>${produkt.marke} – ${produkt.modell}</h3>
                 <p>Einzelpreis: € ${parseFloat(produkt.preis).toFixed(2)}</p>
                 <p>Gesamt: <strong>€ ${preis.toFixed(2)}</strong></p>
@@ -399,15 +403,6 @@ function applySearchFilter() {
 
 // ========== SEITENLADUNG CHECKOUT ==========
 
-// Checkout-spezifische Aktionen nach DOM-Ready
-$(document).ready(function () {
-  
-  if ($("#checkoutCartSummary").length > 0) {
-    checkLoginStatusAndLoadCheckout();
-  }
-
-});
-
 // 1. Login prüfen und dann Warenkorb + Benutzerdaten laden
 function checkLoginStatusAndLoadCheckout() {
   $.ajax({
@@ -441,7 +436,7 @@ function ladeCheckoutWarenkorb() {
     success: function (response) {
       if (response.success) {
         const cart = response.cart;
-        const $ul = $("#checkoutCartSummary");
+        const $ul = $("#checkoutCartSummary"); //List in Checkoutseite
         $ul.empty();
 
         if (Object.keys(cart).length === 0) {
@@ -456,7 +451,7 @@ function ladeCheckoutWarenkorb() {
             `);
             $ul.append($li);
           });
-          $("#checkoutPrice").html("Gesamtpreis: € " + response.gesamtpreis);
+          $("#checkoutPrice").html("Gesamtpreis: € " + response.gesamtpreis.toFixed(2));
         }
 
       } else {
@@ -488,7 +483,7 @@ function ladeNutzerdaten() {
         $("#ort").val(user.ort);
         //Country falls in DB erweitert
         //Zahlungsmethode könnte eingefüllt werden
-        //$("#country").val(user.land || "Austria"); // optionales Feld "land"
+        //$("#country").val(user.land || "Austria"); // optionales Feld "land" --> in DB erweitern
         $("#payment_method").val(user.zahlungsinfo);
       } else {
         console.warn("Kundendaten konnten nicht geladen werden.");
@@ -517,9 +512,11 @@ $("#checkoutForm").on("submit", function (e) {
     plz: $("#plz").val(),
     ort: $("#ort").val(),
     country: $("#country").val(),
+
     payment_method: $("#payment_method").val(),
     coupon_code: eingelösterGutschein ? eingelösterGutschein.code : null
     //payment_method: $("input[name='payment_method']:checked").val()
+
   };
 
   $.ajax({
@@ -557,6 +554,7 @@ function validateCheckoutForm() {
   }
   return true;
 }
+
 
 // ========== GUTSCHEIN EINLÖSEN ==========
 let eingelösterGutschein = null; // global für späteren Zugriff im Checkout
@@ -608,3 +606,92 @@ function berechneNeuenPreis(rabatt) {
   const neuerPreis = Math.max(originalPreis - rabatt, 0);
   return neuerPreis;
 }
+
+// ========== BESTELLVERLAUF ==========
+function loadOrders() {
+
+  $.ajax({
+    url: "http://localhost/Zeitwert/Backend/logic/requestHandler.php",
+    type: "POST",
+    data: {
+      action: "loadOrders"
+    },
+    dataType: "json",
+    success: function (response) {
+      if (response.success) {
+        const order = response.orders;
+        const $tableBody = $("#orderTable");
+        $tableBody.empty();
+
+        if (Object.keys(order).length === 0) {
+          $("#noOrders").text("Es schaut so aus, als ob du noch keine Bestellungen bei Zeitwert getätigt hast.");
+          $("#order-count").text("0");
+          return;
+        }
+
+        $.each(order, function (orderId, item) {
+
+          const $tableRow = $(`
+            <tr>
+              <th scope="row">${item.orderId}</th>
+              <td>${item.total_price}</td>
+              <td>${item.order_date}</td>
+              <td>${item.status}</td>
+              <td>
+                <button class="btn btn-secondary btn-sm mt-2" onclick="loadOrderItems(${item.orderId})">Details</button>
+              </td>
+            </tr>
+          `);
+
+          $tableBody.append($tableRow);
+        });
+      }
+    },
+    error: function (xhr, status, error) {
+      console.error("Fehler bei der Suche:", error);
+    }
+  });
+}
+
+function loadOrderItems(orderId) {
+  $.ajax({
+    url: "http://localhost/Zeitwert/Backend/logic/requestHandler.php",
+    type: "POST",
+    data: {
+      action: "loadOrderItems",
+      orderId: orderId
+    },
+    dataType: "json",
+    success: function (response) {
+      if (response.success) {
+        const items = response.items;
+        const $tbody = $("#orderDetailsBody");
+        $tbody.empty();
+
+        $.each(items, function (index, item) {
+          const row = `
+                        <tr>
+                          <td>${item.produktname}</td>
+                          <td>${item.menge}</td>
+                          <td>${parseFloat(item.preis).toFixed(2)} €</td>
+                          <td>${(item.menge * item.preis).toFixed(2)} €</td>
+                        </tr>
+                      `;
+
+          $tbody.append(row);
+        });
+
+        // Modal anzeigen
+        const modal = new bootstrap.Modal($('#orderDetailsModal'));
+        modal.show();
+        //$tbody.removeClass("d-none");
+      } else {
+        alert("Fehler beim Laden der Bestelldetails.");
+      }
+    },
+    error: function (xhr, status, error) {
+      console.error("Fehler bei der Anfrage:", error);
+    }
+  });
+}
+
