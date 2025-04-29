@@ -363,6 +363,54 @@ elseif ($action === 'deleteCoupon') {
     }
 }
 
+// ==== COUPONS EINLÖSEN & VALIDIEREN ====
+
+elseif ($action === 'validateCoupon') {
+    $code = $_POST['code'] ?? '';
+
+    if (empty($code)) {
+        $response['message'] = "Kein Gutscheincode übergeben.";
+    } else {
+        $coupon = $couponModel->getCouponByCode($code);
+
+        if ($coupon) {
+            $heute = date('Y-m-d');
+
+            if ($coupon['status'] === 'eingelöst') {
+                $response['message'] = "Gutschein wurde bereits eingelöst.";
+            } elseif ($coupon['valid_until'] < $heute) {
+                $response['message'] = "Gutschein ist abgelaufen.";
+            } else {
+                $response['success'] = true;
+                $response['coupon'] = [
+                    'id' => $coupon['id'],
+                    'code' => $coupon['code'],
+                    'wert' => $coupon['wert'],
+                    'valid_until' => $coupon['valid_until']
+                ];
+            }
+        } else {
+            $response['message'] = "Gutschein nicht gefunden.";
+        }
+    }
+}
+
+elseif ($action === 'useCoupon') {
+    $code = $_POST['code'] ?? '';
+
+    if (empty($code)) {
+        $response['message'] = "Kein Gutscheincode angegeben.";
+    } else {
+        if ($couponModel->markCouponAsUsed($code)) {
+            $response['success'] = true;
+            $response['message'] = "Gutschein erfolgreich eingelöst.";
+        } else {
+            $response['message'] = "Gutschein konnte nicht eingelöst werden.";
+        }
+    }
+}
+
+
 
 // ==== KUNDEN VERWALTEN ===================================================
 
@@ -444,7 +492,26 @@ elseif ($action === 'placeOrder') {
                 $totalAmount += $item['product']['preis'] * $item['qty'];
             }
 
+
+            // === NEU: Gutschein anwenden, falls vorhanden
+            if (!empty($_POST['coupon_code'])) {
+                $couponCode = $_POST['coupon_code'];
+                $coupon = $couponModel->getCouponByCode($couponCode);
+
+                if ($coupon && $coupon['status'] === 'offen' && $coupon['valid_until'] >= date('Y-m-d')) {
+                    $totalAmount -= floatval($coupon['wert']);
+                    if ($totalAmount < 0) {
+                        $totalAmount = 0; // Kein negativer Preis
+                    }
+                    $couponModel->markCouponAsUsed($couponCode);
+                }
+            }
+
+
+            // 1. Bestellung in "orders" speichern
+
             // Bestellung in "orders" speichern
+
             $sqlOrder = "INSERT INTO orders (user_id, total_price, order_date, status) VALUES (:user_id, :total_price, NOW(), :status)";
             $paramsOrder = [
                 ':user_id' => $userId,

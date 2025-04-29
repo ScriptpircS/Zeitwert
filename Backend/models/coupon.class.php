@@ -37,6 +37,22 @@ class Coupon {
         return $this->db->execute($sql, $params);
     }
 
+     // Gutschein anhand Code holen
+     public function getCouponByCode($code) {
+        $sql = "SELECT * FROM coupons WHERE UPPER(code) = UPPER(:code) LIMIT 1";
+        $params = [':code' => $code];
+        $result = $this->db->select($sql, $params);
+        return count($result) === 1 ? $result[0] : null;
+    }
+    
+
+    // Gutschein als eingelöst markieren
+    public function markCouponAsUsed($code) {
+        $sql = "UPDATE coupons SET status = 'eingelöst' WHERE code = :code";
+        $params = [':code' => $code];
+        return $this->db->execute($sql, $params);
+    }
+
     // Hilfsfunktion: 5-stelligen Zufallscode generieren
     private function generateRandomCode() {
         $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
