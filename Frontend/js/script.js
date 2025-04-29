@@ -38,6 +38,12 @@ $(document).ready(function () {
     fetchAdminProducts(); // Laden der Produkte nur für Admin-Seiten
   }
 
+  // Checkout laden
+  if ($("#checkoutCartSummary").length > 0) {
+    checkLoginStatusAndLoadCheckout();
+  }
+
+  //Bestellhistorie
   loadOrders();
 });
 
@@ -397,15 +403,6 @@ function applySearchFilter() {
 
 // ========== SEITENLADUNG CHECKOUT ==========
 
-// Checkout-spezifische Aktionen nach DOM-Ready
-$(document).ready(function () {
-
-  if ($("#checkoutCartSummary").length > 0) {
-    checkLoginStatusAndLoadCheckout();
-  }
-
-});
-
 // 1. Login prüfen und dann Warenkorb + Benutzerdaten laden
 function checkLoginStatusAndLoadCheckout() {
   $.ajax({
@@ -439,7 +436,7 @@ function ladeCheckoutWarenkorb() {
     success: function (response) {
       if (response.success) {
         const cart = response.cart;
-        const $ul = $("#checkoutCartSummary");
+        const $ul = $("#checkoutCartSummary"); //List in Checkoutseite
         $ul.empty();
 
         if (Object.keys(cart).length === 0) {
@@ -454,7 +451,7 @@ function ladeCheckoutWarenkorb() {
             `);
             $ul.append($li);
           });
-          $("#checkoutPrice").html("Gesamtpreis: € " + response.gesamtpreis);
+          $("#checkoutPrice").html("Gesamtpreis: € " + response.gesamtpreis.toFixed(2));
         }
 
       } else {
@@ -486,7 +483,7 @@ function ladeNutzerdaten() {
         $("#ort").val(user.ort);
         //Country falls in DB erweitert
         //Zahlungsmethode könnte eingefüllt werden
-        //$("#country").val(user.land || "Austria"); // optionales Feld "land"
+        //$("#country").val(user.land || "Austria"); // optionales Feld "land" --> in DB erweitern
         $("#payment_method").val(user.zahlungsinfo);
       } else {
         console.warn("Kundendaten konnten nicht geladen werden.");

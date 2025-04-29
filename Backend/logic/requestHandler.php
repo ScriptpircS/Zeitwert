@@ -444,7 +444,7 @@ elseif ($action === 'placeOrder') {
                 $totalAmount += $item['product']['preis'] * $item['qty'];
             }
 
-            // 1. Bestellung in "orders" speichern
+            // Bestellung in "orders" speichern
             $sqlOrder = "INSERT INTO orders (user_id, total_price, order_date, status) VALUES (:user_id, :total_price, NOW(), :status)";
             $paramsOrder = [
                 ':user_id' => $userId,
@@ -458,7 +458,7 @@ elseif ($action === 'placeOrder') {
 
             $orderId = $db->getLastInsertId();
 
-            // 2. Bestellte Produkte in "order_items" speichern
+            // Bestellte Produkte in "order_items" speichern
             foreach ($cart as $productId => $item) {
                 $sqlItem = "INSERT INTO order_items (order_id, product_id, menge, preis) 
                             VALUES (:order_id, :product_id, :quantity, :price_per_item)";
@@ -503,11 +503,11 @@ elseif ($action === 'loadOrders') {
             $user = $userResult[0];
             $userId = $user['id'];
 
-            // Bestellungen abrufen
+            // Bestellungen abrufen (absteigende Reihenfolge)
             $sql = "SELECT id AS orderId, total_price, order_date, status 
                     FROM orders 
                     WHERE user_id = ? 
-                    ORDER BY order_date DESC";
+                    ORDER BY order_date ASC";
 
             $orders = $db->select($sql, [$userId]);
 
@@ -523,6 +523,7 @@ elseif ($action === 'loadOrders') {
     exit;
 } 
 
+// ==== BESTELLDETAILS LADEN ==============================================
 elseif ($action === 'loadOrderItems') {
     $orderId = $_POST['orderId'] ?? null;
 
@@ -533,6 +534,7 @@ elseif ($action === 'loadOrderItems') {
         try {
             $db = dbaccess::getInstance();
 
+            // Kombiniert Marke & Modell zu Produktname und joint order_items mit products um die Produktinfos zu laden
             $sql = "
                     SELECT 
                         CONCAT(p.marke, ' ', p.modell) AS produktname,
