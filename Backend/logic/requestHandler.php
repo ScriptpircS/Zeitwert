@@ -59,16 +59,14 @@ if ($action === 'login') {
         $result = $userModel->getByEmailOrUsername($loginCredentials);
 
         if (count($result) === 1) {
-            
+
             if ($result[0]['is_active'] == 'inactive') {
                 $response['success'] = false;
                 $response['message'] = "Dein Account ist deaktiviert. Bitte kontaktiere den Support.";
-            } 
-
-            elseif (password_verify($password, $result[0]['password_hash'])) {
+            } elseif (password_verify($password, $result[0]['password_hash'])) {
                 $_SESSION["username"] = $result[0]['username'];
                 $_SESSION["role"] = $result[0]['role'];
-                
+
                 if ($stayLoggedIn === "true" || $stayLoggedIn === true) {
                     setcookie("stayLoggedIn", $loginCredentials, [
                         'expires' => time() + (86400 * 30),
@@ -87,7 +85,7 @@ if ($action === 'login') {
         }
     }
 
-// ==== REGISTRIERUNG ====================================================
+    // ==== REGISTRIERUNG ====================================================
 
 } elseif ($action === 'register') {
     if (!empty($_POST['email']) && !empty($_POST['username'])) {
@@ -109,13 +107,13 @@ if ($action === 'login') {
         $response['message'] = "E-Mail oder Benutzername fehlt.";
     }
 
-// ==== IN DEN WARENKORB LEGEN ============================================
+    // ==== IN DEN WARENKORB LEGEN ============================================
 
 } elseif ($action === 'addToCart') {
     $productId = $_POST['productId'] ?? null;
 
     if ($productId !== null) {
-        $product = $productModel->getProductById($productId); 
+        $product = $productModel->getProductById($productId);
 
         if ($product) {
             if (!isset($_SESSION['cart'])) {
@@ -130,15 +128,14 @@ if ($action === 'login') {
 
             $totalQty = array_sum(array_column($_SESSION['cart'], 'qty'));
             $response = ['success' => true, 'cartCount' => $totalQty];
-        }
-        else {
+        } else {
             $response['message'] = "Produkt wurde nicht gefunden.";
         }
     } else {
         $response['message'] = "Produkt-ID fehlt.";
-    
+
     }
-// ==== WARENKORB ANZEIGEN ===============================================
+    // ==== WARENKORB ANZEIGEN ===============================================
 
 } elseif ($action === 'getCart') {
     $cart = $_SESSION['cart'] ?? [];
@@ -156,7 +153,7 @@ if ($action === 'login') {
     $response['gesamtpreis'] = $gesamtpreis;
     $response['gesamtmenge'] = $gesamtmenge;
 
-// ==== WARENKORB VERÄNDERN ===============================================
+    // ==== WARENKORB VERÄNDERN ===============================================
 
 } elseif ($action === 'removeFromCart') {
     unset($_SESSION['cart'][$_POST['productId']]);
@@ -165,7 +162,7 @@ if ($action === 'login') {
     $_SESSION['cart'][$_POST['productId']]['qty'] = $_POST['quantity'];
 
 
-// ==== PRODUKTÜBERSICHT LADEN ============================================
+    // ==== PRODUKTÜBERSICHT LADEN ============================================
 
 } elseif ($action === 'getProducts') {
     $products = $productModel->getAllProducts();
@@ -185,13 +182,13 @@ if ($action === 'login') {
         $response['message'] = "Keine Kategorie-ID übergeben.";
     }
 
-// ==== PRODUKTE FILTERN ==================================================
+    // ==== PRODUKTE FILTERN ==================================================
 
 } elseif ($action === 'searchProducts') {
     $query = $_POST['query'] ?? '';
     $results = $productModel->searchProducts($query);
 
-    if(empty($results)) {
+    if (empty($results)) {
         $response['success'] = false;
         $response['message'] = "Keine passenden Produkte gefunden!";
     } else {
@@ -201,14 +198,11 @@ if ($action === 'login') {
 }
 
 // ==== PRODUKTE ADMIN - READ ====
-
 elseif ($action === 'listProducts') {
     $products = $productModel->getAllProducts();
     $response['success'] = true;
     $response['products'] = $products;
-}
-
-elseif ($action === 'getProduct') {
+} elseif ($action === 'getProduct') {
     $productId = $_POST['id'] ?? null;
     if ($productId) {
         $product = $productModel->getProductById($productId);
@@ -224,7 +218,6 @@ elseif ($action === 'getProduct') {
 }
 
 // ==== PRODUKTE ADMIN - CREATE ====
-
 elseif ($action === 'createProduct') {
     $productData = [
         'marke' => $_POST['marke'] ?? '',
@@ -238,19 +231,19 @@ elseif ($action === 'createProduct') {
         $allowed = ['jpg', 'jpeg', 'png', 'webp'];
         $ext = strtolower(pathinfo($_FILES['bild']['name'], PATHINFO_EXTENSION));
         if (in_array($ext, $allowed)) {
-       
+
             $modell = isset($_POST['modell']) ? $_POST['modell'] : 'default';
             $modell = preg_replace('/[^a-zA-Z0-9_-]/', '_', $modell); // nur sichere Zeichen
-            
+
             $imageName = $modell . '.' . $ext;
             $uploadPath = __DIR__ . '/../productpictures/' . $imageName;
-    
+
             move_uploaded_file($_FILES['bild']['tmp_name'], $uploadPath);
-    
+
             $bild_url = $imageName;
         }
     }
-    
+
     $productData['bild_url'] = $bild_url;
 
     if ($productModel->createProduct($productData)) {
@@ -262,7 +255,6 @@ elseif ($action === 'createProduct') {
 }
 
 // ==== PRODUKTE ADMIN - UPDATE ====
-
 elseif ($action === 'updateProduct') {
     $productData = [
         'id' => $_POST['id'] ?? '',
@@ -278,7 +270,7 @@ elseif ($action === 'updateProduct') {
         if (in_array($ext, $allowed)) {
             $modell = isset($_POST['modell']) ? $_POST['modell'] : 'default';
             $modell = preg_replace('/[^a-zA-Z0-9_-]/', '_', $modell); // nur sichere Zeichen
-            
+
             $imageName = $modell . '.' . $ext;
             $uploadFolder = __DIR__ . '/../productpictures/';
             move_uploaded_file($_FILES['bild']['tmp_name'], $uploadFolder . $imageName);
@@ -295,7 +287,6 @@ elseif ($action === 'updateProduct') {
 }
 
 // ==== PRODUKTE ADMIN - DELETE ====
-
 elseif ($action === 'deleteProduct') {
     $productId = $_POST['id'] ?? null;
     if ($productId && $productModel->deleteProduct($productId)) {
@@ -304,9 +295,7 @@ elseif ($action === 'deleteProduct') {
     } else {
         $response['message'] = "Fehler beim Löschen.";
     }
-}
-
-elseif ($action === 'deleteImage') {
+} elseif ($action === 'deleteImage') {
     $productId = $_POST['id'] ?? null;
     if ($productId) {
         $product = $productModel->getProductById($productId);
@@ -460,7 +449,7 @@ elseif ($action === 'placeOrder') {
             $paramsOrder = [
                 ':user_id' => $userId,
                 ':total_price' => $totalAmount,
-                ':status' => 'ordered'
+                ':status' => 'pending'
             ];
 
             if (!$db->execute($sqlOrder, $paramsOrder)) {
@@ -493,10 +482,83 @@ elseif ($action === 'placeOrder') {
     }
 }
 
+// ==== BESTELLUNGEN LADEN ================================================
+elseif ($action === 'loadOrders') {
 
+    if (!isset($_SESSION['username'])) {
+        $response['success'] = false;
+        $response['message'] = "Du musst eingeloggt sein, um deine Bestellungen anzuzeigen.";
+    } else {
+        try {
+            $db = dbaccess::getInstance();
+
+            // Kundendaten abrufen
+            $username = $_SESSION['username'];
+            $userResult = $userModel->getByEmailOrUsername($username);
+
+            if (count($userResult) !== 1) {
+                throw new Exception("Benutzerdaten konnten nicht geladen werden.");
+            }
+
+            $user = $userResult[0];
+            $userId = $user['id'];
+
+            // Bestellungen abrufen
+            $sql = "SELECT id AS orderId, total_price, order_date, status 
+                    FROM orders 
+                    WHERE user_id = ? 
+                    ORDER BY order_date DESC";
+
+            $orders = $db->select($sql, [$userId]);
+
+            $response['success'] = true;
+            $response['orders'] = $orders;
+        } catch (Exception $e) {
+            $response['success'] = false;
+            $response['message'] = $e->getMessage();
+        }
+    }
+
+    echo json_encode($response);
+    exit;
+} 
+
+elseif ($action === 'loadOrderItems') {
+    $orderId = $_POST['orderId'] ?? null;
+
+    if (!$orderId) {
+        $response['success'] = false;
+        $response['message'] = "Keine Bestell-ID angegeben.";
+    } else {
+        try {
+            $db = dbaccess::getInstance();
+
+            $sql = "
+                    SELECT 
+                        CONCAT(p.marke, ' ', p.modell) AS produktname,
+                        oi.menge,
+                        oi.preis
+                    FROM order_items oi
+                    JOIN products p ON oi.product_id = p.id
+                    WHERE oi.order_id = ?
+                    ";
+
+
+            $items = $db->select($sql, [$orderId]);
+
+            $response['success'] = true;
+            $response['items'] = $items;
+        } catch (Exception $e) {
+            $response['success'] = false;
+            $response['message'] = $e->getMessage();
+        }
+    }
+
+    echo json_encode($response);
+    exit;
+}
 
 // ==== DEFAULT: UNBEKANNTE AKTION ========================================
-
 else {
     $response['message'] = "Ungültige Aktion.";
 }
