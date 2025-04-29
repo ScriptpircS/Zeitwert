@@ -507,7 +507,7 @@ elseif ($action === 'loadOrders') {
             $sql = "SELECT id AS orderId, total_price, order_date, status 
                     FROM orders 
                     WHERE user_id = ? 
-                    ORDER BY order_date ASC";
+                    ORDER BY order_date DESC";
 
             $orders = $db->select($sql, [$userId]);
 
