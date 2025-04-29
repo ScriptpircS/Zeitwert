@@ -517,7 +517,8 @@ $("#checkoutForm").on("submit", function (e) {
     plz: $("#plz").val(),
     ort: $("#ort").val(),
     country: $("#country").val(),
-    payment_method: $("#payment_method").val()
+    payment_method: $("#payment_method").val(),
+    coupon_code: eingelösterGutschein ? eingelösterGutschein.code : null
     //payment_method: $("input[name='payment_method']:checked").val()
   };
 
@@ -557,3 +558,53 @@ function validateCheckoutForm() {
   return true;
 }
 
+// ========== GUTSCHEIN EINLÖSEN ==========
+let eingelösterGutschein = null; // global für späteren Zugriff im Checkout
+
+$(document).on("click", "#applyCouponBtn", function () {
+  const code = $("#couponCode").val().trim();
+
+  if (!code) {
+    $("#couponMessage").text("Bitte einen Gutscheincode eingeben.");
+    return;
+  }
+
+  $.ajax({
+    url: "http://localhost/Zeitwert/Backend/logic/requestHandler.php",
+    type: "POST",
+    dataType: "json",
+    data: {
+      action: "validateCoupon",
+      code: code
+    },
+    success: function (response) {
+      if (response.success) {
+        eingelösterGutschein = response.coupon; // Gutschein speichern
+        const rabatt = parseFloat(response.coupon.wert);
+        const neuerPreis = berechneNeuenPreis(rabatt);
+        $("#couponMessage").removeClass("text-danger").addClass("text-success")
+          .text(`Gutschein gültig! €${rabatt.toFixed(2)} werden abgezogen.`);
+
+        $("#checkoutPrice").html(`Gesamtpreis nach Gutschein: <strong>€ ${neuerPreis.toFixed(2)}</strong>`);
+      } else {
+        eingelösterGutschein = null;
+        $("#couponMessage").removeClass("text-success").addClass("text-danger")
+          .text("Ungültiger oder abgelaufener Gutscheincode.");
+      }
+    },
+    error: function () {
+      $("#couponMessage").removeClass("text-success").addClass("text-danger")
+        .text("Fehler beim Einlösen des Gutscheins.");
+    }
+  });
+});
+
+// Hilfsfunktion: Neuen Preis berechnen
+function berechneNeuenPreis(rabatt) {
+  const gesamtText = $("#checkoutPrice").text();
+  const match = gesamtText.match(/(\d+[.,]?\d*)/);
+  if (!match) return 0;
+  const originalPreis = parseFloat(match[1].replace(",", "."));
+  const neuerPreis = Math.max(originalPreis - rabatt, 0);
+  return neuerPreis;
+}

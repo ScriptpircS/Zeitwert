@@ -70,10 +70,18 @@
                 <!-- Einfügen über Script, falls Checkbox abgehakt -->
             </div>
 
-            <div id="coupons" hidden>
-                <h2>Gutscheine</h2>
-                <!-- Gutscheine hier hinzufügen -->
-            </div>
+           <!-- GUTSCHEINCODE EINLÖSEN -->
+          <!-- Gutscheincode-Eingabe -->
+<div id="couponSection" class="my-3">
+    <h2>Gutscheincode einlösen</h2>
+    <div class="input-group mb-2">
+      <input type="text" id="couponCode" class="form-control" placeholder="Gutscheincode eingeben">
+      <button type="button" class="btn btn-outline-success" id="applyCouponBtn">Einlösen</button>
+    </div>
+    <div id="couponMessage" class="text-danger"></div>
+  </div>
+  
+        
             <br>
             <button class="btn btn-primary" type="submit" id="checkoutSubmit">
                 Bestellung abschließen
