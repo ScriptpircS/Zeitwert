@@ -1,23 +1,31 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light px-4">
   <a class="navbar-brand" href="#">Zeitwert</a>
-  <div class="collapse navbar-collapse justify-content-end">
-    <span id="welcomeUser" class="me-3 d-none"></span>
 
-    <a href="#" class="nav-link" id="registerLink">Registrieren</a>
-    <a href="#" class="nav-link" id="loginLink">Login</a>
-    <a href="#" class="nav-link d-flex align-items-center" id="Warenkorb">
-      <div id="dropzone-warenkorb" ondrop="handleDrop(event)" ondragover="handleDragOver(event)">
-      🛒 <span id="cart-count" class="badge bg-primary ms-1">0</span><br>
+  <div class="collapse navbar-collapse">
+    <div class="navbar-nav ms-auto">
+      <!-- Begrüßung -->
+      <span id="welcomeUser" class="nav-link d-none"></span>
+
+      <!-- Alle Links -->
+      <a href="#" class="nav-link" id="registerLink">Registrieren</a>
+      <a href="#" class="nav-link" id="loginLink">Login</a>
+
+      <a href="#" class="nav-link d-flex align-items-center" id="Warenkorb">
+        <div id="dropzone-warenkorb" class="dropzone">
+          🛒 <span id="cart-count" class="badge bg-primary ms-1">0</span><br>
+        </div>
+      </a>
+
+      <a href="#" class="nav-link d-none" id="accountLink">Mein Konto</a>
+      <a href="#" class="nav-link d-none" id="orderHistoryLink">Bestellungen</a>
+
+      <!-- Admin-Links -->
+      <a href="#" class="nav-link d-none" id="adminProductsLink">Produkte</a>
+      <a href="#" class="nav-link d-none" id="adminCustomersLink">Kunden</a>
+      <a href="#" class="nav-link d-none" id="adminCouponsLink">Gutscheine</a>
+
+      <!-- Logout ganz am Ende -->
+      <a href="#" class="nav-link d-none" id="logoutLink">Logout</a>
     </div>
-    </a>
-    <a href="#" class="nav-link d-none" id="accountLink">Mein Konto</a>
-    <a href="#" class="nav-link d-none" id="orderHistoryLink">Bestellungen</a>
-    <a href="#" class="nav-link d-none" id="logoutLink">Logout</a>
-    
-
-    <!-- Nur für Admin -->
-    <a href="#" class="nav-link d-none" id="adminProductsLink">Produkte</a>
-    <a href="#" class="nav-link d-none" id="adminCustomersLink">Kunden</a>
-    <a href="#" class="nav-link d-none" id="adminCouponsLink">Gutscheine</a>
   </div>
 </nav>

@@ -1,127 +1,131 @@
+// Bestimmt den relativen Pfad zur Root je nach aktueller Seite
 function getPrefix() {
     const path = window.location.pathname;
-
-    if (path.includes("/Frontend/sites/admin/")) {
-        return "../../../";
-    } else if (path.includes("/Frontend/sites/")) {
-        return "../../";
-    } else {
-        return "";
-    }
-}
-
-
-function loadNavbar() {
+    if (path.includes("/Frontend/sites/admin/")) return "../../../";
+    if (path.includes("/Frontend/sites/")) return "../../";
+    return "";
+  }
+  
+  // Lädt die Navbar-Datei und initialisiert alles
+  function loadNavbar() {
     const prefix = getPrefix();
-    const basePath = prefix + "Frontend/sites/navbar.html";
-
-    fetch(basePath)
-        .then(res => res.text())
-        .then(html => {
-            const navbarContainer = document.createElement('div');
-            navbarContainer.innerHTML = html;
-            document.body.insertBefore(navbarContainer, document.body.firstChild);
-
-            fixNavbarLinks(prefix);
-            checkAutoLogin().then(() => {
-                handleUserSession(prefix);
-            });
+    const navbarPath = prefix + "Frontend/sites/navbar.html";
+  
+    fetch(navbarPath)
+      .then(res => res.text())
+      .then(html => {
+        const navbarContainer = document.createElement("div");
+        navbarContainer.innerHTML = html;
+        document.body.insertBefore(navbarContainer, document.body.firstChild);
+  
+        fixNavbarLinks(prefix);
+        checkAutoLogin().then(() => {
+          handleUserSession(prefix);
+          initLogout(prefix);
         });
-}
+  
+        if (typeof initDragAndDrop === "function") {
+          initDragAndDrop();
+        }
 
-function fixNavbarLinks(prefix) {
+        if (document.getElementById("warenkorbContainer") && typeof ladeWarenkorb === "function") {
+          ladeWarenkorb();
+        }
+        
+      });
+  }
+  
+  // Setzt die hrefs aller Links relativ korrekt
+  function fixNavbarLinks(prefix) {
     const linkMap = {
-        "Zeitwert": "index.html",
-        "loginLink": "Frontend/sites/login.html",
-        "registerLink": "Frontend/sites/Register.html",
-        "Warenkorb": "Frontend/sites/cart.html",
-        "accountLink": "Frontend/sites/account.html",
-        "orderHistoryLink": "Frontend/sites/orderHistory.html",
-        "adminProductsLink": "Frontend/sites/admin/products.html",
-        "adminCustomersLink": "Frontend/sites/admin/customers.html",
-        "adminCouponsLink": "Frontend/sites/admin/coupons.html"
+      Zeitwert: "index.html",
+      loginLink: "Frontend/sites/login.html",
+      registerLink: "Frontend/sites/Register.html",
+      Warenkorb: "Frontend/sites/cart.html",
+      accountLink: "Frontend/sites/account.html",
+      orderHistoryLink: "Frontend/sites/orderHistory.html",
+      adminProductsLink: "Frontend/sites/admin/products.html",
+      adminCustomersLink: "Frontend/sites/admin/customers.html",
+      adminCouponsLink: "Frontend/sites/admin/coupons.html"
     };
-
-    const brand = document.querySelector(".navbar-brand");
-    if (brand) brand.setAttribute("href", prefix + linkMap["Zeitwert"]);
-
+  
+    document.querySelector(".navbar-brand")?.setAttribute("href", prefix + linkMap["Zeitwert"]);
+  
     for (const [id, path] of Object.entries(linkMap)) {
-        const el = document.getElementById(id);
-        if (el) {
-            el.setAttribute("href", prefix + path);
-        }
+      const el = document.getElementById(id);
+      if (el) el.setAttribute("href", prefix + path);
     }
-}
-
-function handleUserSession(prefix) {
+  }
+  
+  // Holt Sessiondaten und passt die UI je nach Loginstatus an
+  function handleUserSession(prefix) {
     const sessionPath = prefix + "Backend/logic/getUserSession.php";
-
+  
     fetch(sessionPath)
-        .then(res => res.json())
-        .then(data => {
-            if (data.loggedIn) {
-                $("#welcomeUser").text("Hallo, " + data.username).removeClass("d-none");
-                $("#loginLink").addClass("d-none");
-                $("#registerLink").addClass("d-none");
-                $("#logoutLink").removeClass("d-none");
-                $("#accountLink").removeClass("d-none");
-                $("#orderHistoryLink").removeClass("d-none");
-
-                if (data.role === "admin") {
-                    $("#adminProductsLink").removeClass("d-none");
-                    $("#adminCustomersLink").removeClass("d-none");
-                    $("#adminCouponsLink").removeClass("d-none");
-                }
-            }
-        });
-
-    document.addEventListener("click", function (e) {
-        if (e.target.id === "logoutLink") {
-            e.preventDefault();
-            const logoutPath = prefix + "Backend/logic/logout.php";
-
-            fetch(logoutPath)
-                .then(() => window.location.href = prefix + "Frontend/sites/login.html");
+      .then(res => res.json())
+      .then(data => {
+        if (data.loggedIn) {
+          $("#welcomeUser").text("Hallo, " + data.username).removeClass("d-none");
+          $("#loginLink, #registerLink").addClass("d-none");
+          $("#logoutLink, #accountLink, #orderHistoryLink").removeClass("d-none");
+  
+        if (data.role === "admin") {
+          $("#adminProductsLink, #adminCustomersLink, #adminCouponsLink, #logoutLink").removeClass("d-none");
+          $("#accountLink, #orderHistoryLink, #Warenkorb, #loginLink, #registerLink").addClass("d-none");
         }
+        }
+      });
+  }
+  
+  // Initialisiert Logout-Verhalten
+  function initLogout(prefix) {
+    document.addEventListener("click", function (e) {
+      if (e.target.id === "logoutLink") {
+        e.preventDefault();
+        const logoutPath = prefix + "Backend/logic/logout.php";
+  
+        fetch(logoutPath)
+        .then(() => window.location.href = prefix + "index.html")
+        .catch(err => console.error("Logout fehlgeschlagen:", err));
+      }
     });
-}
-
-// Hilfsfunktion, Prüft gespeicherte Cookies
-function getCookieValue(name) {
-    const cookies = document.cookie.split(';');
+  }
+  
+  // Liest gespeicherte Cookies
+  function getCookieValue(name) {
+    const cookies = document.cookie.split(";");
     for (let cookie of cookies) {
-        let [key, val] = cookie.trim().split('=');
-        if (key === name) return val;
+      let [key, val] = cookie.trim().split("=");
+      if (key === name) return val;
     }
     return null;
-}
-
-// Loggt User ein, wenn stayLoggedIn gesetzt wurde
-async function checkAutoLogin() {
+  }
+  
+  // Automatischer Login über Cookie
+  async function checkAutoLogin() {
     const savedUser = getCookieValue("stayLoggedIn");
-
-    if (savedUser) {
-        try {
-            const response = await $.ajax({
-                url: "http://localhost/Zeitwert/Backend/logic/requestHandler.php",
-                type: "POST",
-                data: {
-                    action: "autoLogin",
-                    loginCredentials: savedUser
-                }
-            });
-
-            if (response.success) {
-                console.log("Auto-Login erfolgreich:", response.username);
-            } else {
-                console.log("Auto-Login fehlgeschlagen:", response.message);
-            }
-        } catch (error) {
-            console.error("Fehler beim Auto-Login:", error);
+    if (!savedUser) return;
+  
+    try {
+      const response = await $.ajax({
+        url: "http://localhost/Zeitwert/Backend/logic/requestHandler.php",
+        type: "POST",
+        data: {
+          action: "autoLogin",
+          loginCredentials: savedUser
         }
+      });
+  
+      if (response.success) {
+        console.log("Auto-Login erfolgreich:", response.username);
+      } else {
+        console.log("Auto-Login fehlgeschlagen:", response.message);
+      }
+    } catch (error) {
+      console.error("Fehler beim Auto-Login:", error);
     }
-}
-
-
-
-document.addEventListener("DOMContentLoaded", loadNavbar);
+  }
+  
+  // Initialisierung starten
+  document.addEventListener("DOMContentLoaded", loadNavbar);
+  
