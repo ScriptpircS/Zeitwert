@@ -32,6 +32,11 @@ class dbaccess {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function selectSingle($sql, $params = []) {
+    $result = $this->select($sql, $params);
+    return $result[0] ?? null;
+    }
+
     // INSERT, UPDATE, DELETE
     public function execute($sql, $params = []) {
         $stmt = $this->pdo->prepare($sql);

@@ -29,6 +29,9 @@ function loadOrders() {
                 <td>
                   <button class="btn btn-secondary btn-sm mt-2" onclick="loadOrderItems(${item.orderId})">Details</button>
                 </td>
+                <td>
+                  <a class="btn btn-outline-success btn-sm mt-2" target="_blank" href="http://localhost/Zeitwert/Backend/logic/handlers/invoiceHandler.php?orderId=${item.orderId}"> PDF </a>
+                </td>
               </tr>
             `);
   
