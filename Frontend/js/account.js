@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", function () {
   
   // Benutzerdaten laden
   function ladeBenutzerdaten() {
-    $.post("../../Backend/logic/accountHandler.php", { action: "getUserData" }, function (response) {
+    $.post("../../Backend/logic/requestHandler.php", { action: "getAccountData" }, function (response) {
       if (response.success && response.data) {
         const data = response.data;
         $("#anzeigeAnrede").text(data.anrede || "-");
@@ -64,7 +64,7 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
   
-    $.post("../../Backend/logic/accountHandler.php", {
+    $.post("../../Backend/logic/requestHandler.php", {
       action: "updateAddress",
       password: passwort,
       newData: dataObj
@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
   
-    $.post("../../Backend/logic/accountHandler.php", {
+    $.post("../../Backend/logic/requestHandler.php", {
       action: "updatePayment",
       password: passwort,
       newData: { zahlungsinfo: zahlungInfo }
@@ -110,7 +110,7 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
   
-    $.post("../../Backend/logic/accountHandler.php", {
+    $.post("../../Backend/logic/requestHandler.php", {
       action: "changePassword",
       currentPassword: currentPassword,
       newPassword: newPassword

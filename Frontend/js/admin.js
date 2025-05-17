@@ -51,7 +51,7 @@ function showCreateForm() {
     $.ajax({
       url: "http://localhost/Zeitwert/Backend/logic/requestHandler.php",
       type: "POST",
-      data: { action: "listProducts" },
+      data: { action: "getProducts" },
       dataType: "json",
       success: function (response) {
         if (response.success) {
