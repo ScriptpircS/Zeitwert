@@ -37,13 +37,33 @@ class Product {
     }
 
     public function createProduct($data) {
-        $sql = "INSERT INTO products (marke, modell, beschreibung, preis, bild_url) 
-                VALUES (:marke, :modell, :beschreibung, :preis, :bild_url)";
+        $sql = "INSERT INTO products (
+            marke, modell, beschreibung, preis, bild_url,
+            referenz, lunette, gehaeuse, uhrwerk, armband,
+            schliesse, merkmale, wasserdicht
+        ) VALUES (
+            :marke, :modell, :beschreibung, :preis, :bild_url,
+            :referenz, :lunette, :gehaeuse, :uhrwerk, :armband,
+            :schliesse, :merkmale, :wasserdicht
+        )";
         return $this->db->execute($sql, $data);
     }
 
     public function updateProduct($data) {
-        $set = "marke = :marke, modell = :modell, beschreibung = :beschreibung, preis = :preis";
+        $set = "
+                marke = :marke,
+                modell = :modell,
+                beschreibung = :beschreibung,
+                preis = :preis,
+                referenz = :referenz,
+                lunette = :lunette,
+                gehaeuse = :gehaeuse,
+                uhrwerk = :uhrwerk,
+                armband = :armband,
+                schliesse = :schliesse,
+                merkmale = :merkmale,
+                wasserdicht = :wasserdicht
+            ";
         if (isset($data['bild_url'])) {
             $set .= ", bild_url = :bild_url";
         }

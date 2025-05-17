@@ -17,6 +17,14 @@ function showCreateForm() {
           <input class="form-control mb-2" type="text" name="marke" placeholder="Marke" required>
           <input class="form-control mb-2" type="text" name="modell" placeholder="Modell" required>
           <textarea class="form-control mb-2" name="beschreibung" placeholder="Beschreibung" rows="3"></textarea>
+          <input class="form-control mb-2" type="text" name="referenz" placeholder="Referenz">
+          <input class="form-control mb-2" type="text" name="lunette" placeholder="Lünette">
+          <input class="form-control mb-2" type="text" name="gehaeuse" placeholder="Gehäuse">
+          <input class="form-control mb-2" type="text" name="uhrwerk" placeholder="Uhrwerk">
+          <input class="form-control mb-2" type="text" name="armband" placeholder="Armband">
+          <input class="form-control mb-2" type="text" name="schliesse" placeholder="Schließe">
+          <textarea class="form-control mb-2" name="merkmale" placeholder="Merkmale" rows="2"></textarea>
+          <input class="form-control mb-2" type="text" name="wasserdicht" placeholder="Wasserdicht">
           <input class="form-control mb-2" type="number" name="preis" placeholder="Preis" step="0.01" required>
           <input class="form-control mb-2" type="file" name="bild" accept="image/*">
           <button class="btn btn-success" type="submit">Speichern</button>
@@ -61,32 +69,45 @@ function showCreateForm() {
     });
   }
   
-  function renderAdminProducts(products) {
-    const $container = $("#contentArea");
-    if ($container.length === 0) return;
-    $container.empty();
-  
-    products.forEach((product) => {
-      const stars =
-        "★".repeat(product.bewertung || 0) +
-        "☆".repeat(5 - (product.bewertung || 0));
-  
-      const $card = $(`
-          <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
-              <div class="product-card" data-id="${product.id}">
-                  <img src="/Zeitwert/Backend/productpictures/${product.bild_url}" alt="${product.modell}" style="max-width:150px;">
-                  <h3>${product.marke} – ${product.modell}</h3>
-                  <p><strong>€ ${parseFloat(product.preis).toFixed(2)}</strong></p>
-                  <p>${product.beschreibung}</p>
-                  <p class="stars">${stars}</p>
-                  <button class="btn btn-warning btn-sm w-100 mb-2" onclick="editProduct(${product.id})">Bearbeiten</button>
-                  <button class="btn btn-danger btn-sm w-100" onclick="deleteProduct(${product.id})">Löschen</button>
-              </div>
-          </div>
-      `);
-      $container.append($card);
-    });
-  }
+function renderAdminProducts(products) {
+  const $container = $("#contentArea");
+  if ($container.length === 0) return;
+  $container.empty();
+
+  let html = `
+    <table class="table table-striped table-hover align-middle">
+      <thead class="table-dark">
+        <tr>
+          <th>Marke</th>
+          <th>Modell</th>
+          <th>Preis (€)</th>
+          <th>Aktionen</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  products.forEach((product) => {
+    html += `
+      <tr>
+        <td>${product.marke}</td>
+        <td>${product.modell}</td>
+        <td>€ ${parseFloat(product.preis || 0).toFixed(2)}</td>
+        <td>
+          <button class="btn btn-warning btn-sm me-1" onclick="editProduct(${product.id})">Bearbeiten</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteProduct(${product.id})">Löschen</button>
+        </td>
+      </tr>
+    `;
+  });
+
+  html += `
+      </tbody>
+    </table>
+  `;
+
+  $container.html(html);
+}
   
   // ========== PRODUKTE ADMIN - UPDATE ==========
   function editProduct(id) {
@@ -105,6 +126,14 @@ function showCreateForm() {
                   <input class="form-control mb-2" type="text" name="marke" value="${product.marke}" required>
                   <input class="form-control mb-2" type="text" name="modell" value="${product.modell}" required>
                   <textarea class="form-control mb-2" name="beschreibung" rows="3">${product.beschreibung}</textarea>
+                  <input class="form-control mb-2" type="text" name="referenz" value="${product.referenz || ''}" placeholder="Referenz">
+                  <input class="form-control mb-2" type="text" name="lunette" value="${product.lunette || ''}" placeholder="Lünette">
+                  <input class="form-control mb-2" type="text" name="gehaeuse" value="${product.gehaeuse || ''}" placeholder="Gehäuse">
+                  <input class="form-control mb-2" type="text" name="uhrwerk" value="${product.uhrwerk || ''}" placeholder="Uhrwerk">
+                  <input class="form-control mb-2" type="text" name="armband" value="${product.armband || ''}" placeholder="Armband">
+                  <input class="form-control mb-2" type="text" name="schliesse" value="${product.schliesse || ''}" placeholder="Schließe">
+                  <textarea class="form-control mb-2" name="merkmale" rows="2" placeholder="Merkmale">${product.merkmale || ''}</textarea>
+                  <input class="form-control mb-2" type="text" name="wasserdicht" value="${product.wasserdicht || ''}" placeholder="Wasserdicht">
                   <input class="form-control mb-2" type="number" name="preis" value="${product.preis}" step="0.01" required>
   
                   <div class="mb-3">

@@ -48,21 +48,22 @@ function fetchProducts() {
         "★".repeat(product.bewertung || 0) +
         "☆".repeat(5 - (product.bewertung || 0));
   
-      const $card = $(`
-        <div class="col-sm-6 col-md-4 col-lg-3">
-          <div class="product-card" draggable="true" data-id="${product.id}">
-            <img src="/Zeitwert/Backend/productpictures/${product.bild_url
-        }" alt="${product.modell}">
-            <h3>${product.marke} – ${product.modell}</h3>
-            <p><strong>€ ${parseFloat(product.preis || 0).toFixed(2)}</strong></p>
-            <p class="stars">${stars}</p>
-            <button class="btn btn-primary add-to-cart-btn" data-id="${product.id
-        }">
-              In den Warenkorb
-            </button>
-          </div>
+    const $card = $(`
+      <div class="col-sm-6 col-md-4 col-lg-3">
+        <div class="product-card" draggable="true" data-id="${product.id}">
+          <img src="/Zeitwert/Backend/productpictures/${product.bild_url}" alt="${product.modell}">
+          <h3>${product.marke} – ${product.modell}</h3>
+          <p><strong>€ ${parseFloat(product.preis || 0).toFixed(2)}</strong></p>
+          <p class="stars">${stars}</p>
+          <button class="btn btn-primary add-to-cart-btn" data-id="${product.id}">
+            In den Warenkorb
+          </button>
+          <button class="btn btn-secondary mt-2 show-details-btn" data-id="${product.id}">
+            Details
+          </button>
         </div>
-      `);
+      </div>
+    `);
   
       $container.append($card);
     });
@@ -90,9 +91,53 @@ function fetchProducts() {
             console.error("AJAX-Fehler:", error);
           },
         });
-      });
+    });
+
+    $(".show-details-btn").click(function () {
+      const productId = $(this).data("id");
+      zeigeProduktDetails(productId);
+    });
       
 }
+
+function zeigeProduktDetails(id) {
+  $.post("http://localhost/Zeitwert/Backend/logic/requestHandler.php", { action: "getProduct", id }, function (response) {
+    if (response.success) {
+      const p = response.product;
+
+      const detailsHtml = `
+        <div class="product-details">
+          <h2>${p.marke || ""} – ${p.modell || "Produkt"}</h2>
+
+          <p>${p.beschreibung || ""}</p>
+          <p class="text-muted">Entdecken Sie weitere Modelle der Marke ${p.marke} in unserem OnlineStore.</p>
+
+          <table class="table table-sm table-borderless">
+            <tbody>
+              <tr><th>Modell</th><td>${p.modell || "-"}</td></tr>
+              <tr><th>Referenz</th><td>${p.referenz || "-"}</td></tr>
+              <tr><th>Lünette</th><td>${p.lunette || "-"}</td></tr>
+              <tr><th>Gehäuse</th><td>${p.gehaeuse || "-"}</td></tr>
+              <tr><th>Uhrwerk</th><td>${p.uhrwerk || "-"}</td></tr>
+              <tr><th>Armband</th><td>${p.armband || "-"}</td></tr>
+              <tr><th>Schließe</th><td>${p.schliesse || "-"}</td></tr>
+              <tr><th>Weitere Merkmale</th><td>${p.merkmale || "-"}</td></tr>
+              <tr><th>Wasserdichtheit</th><td>${p.wasserdicht || "-"}</td></tr>
+            </tbody>
+          </table>
+
+          <h4 class="text-end mt-4">€ ${parseFloat(p.preis).toFixed(2)} <small class="text-muted">inkl. MwSt.</small></h4>
+        </div>
+      `;
+
+      $("#produktDetailsBody").html(detailsHtml);
+      new bootstrap.Modal(document.getElementById('produktDetailsModal')).show();
+    } else {
+      alert("Produkt nicht gefunden.");
+    }
+  }, "json");
+}
+
 
 function initCategoryFilter() {
   $("#categorySelect").on("change", function () {
