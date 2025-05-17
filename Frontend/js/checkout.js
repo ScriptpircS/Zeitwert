@@ -2,7 +2,7 @@ let eingelösterGutschein = null;
 
 function checkLoginStatusAndLoadCheckout() {
   $.ajax({
-    url: "../../Backend/logic/getUserSession.php",
+    url: "../../Backend/logic/utils/getUserSession.php",
     type: "POST",
     dataType: "json",
     success: function (response) {
