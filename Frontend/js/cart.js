@@ -5,7 +5,6 @@ function ladeWarenkorb() {
     data: { action: "getCart" },
     dataType: "json",
     success: function (response) {
-      console.log("Antwort von getCart:", response); // Debug-Ausgabe
 
       if (!response.success) {
         $("#warenkorbContainer").html("<p>Fehler beim Laden des Warenkorbs.</p>");
