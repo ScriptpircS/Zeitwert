@@ -63,6 +63,14 @@ elseif ($action === 'createProduct') {
         'modell' => $_POST['modell'] ?? '',
         'beschreibung' => $_POST['beschreibung'] ?? '',
         'preis' => $_POST['preis'] ?? 0,
+        'referenz' => $_POST['referenz'] ?? null,
+        'lunette' => $_POST['lunette'] ?? null,
+        'gehaeuse' => $_POST['gehaeuse'] ?? null,
+        'uhrwerk' => $_POST['uhrwerk'] ?? null,
+        'armband' => $_POST['armband'] ?? null,
+        'schliesse' => $_POST['schliesse'] ?? null,
+        'merkmale' => $_POST['merkmale'] ?? null,
+        'wasserdicht' => $_POST['wasserdicht'] ?? null
     ];
 
     $bild_url = null;
@@ -98,6 +106,14 @@ elseif ($action === 'updateProduct') {
         'modell' => $_POST['modell'] ?? '',
         'beschreibung' => $_POST['beschreibung'] ?? '',
         'preis' => $_POST['preis'] ?? '',
+        'referenz' => $_POST['referenz'] ?? null,
+        'lunette' => $_POST['lunette'] ?? null,
+        'gehaeuse' => $_POST['gehaeuse'] ?? null,
+        'uhrwerk' => $_POST['uhrwerk'] ?? null,
+        'armband' => $_POST['armband'] ?? null,
+        'schliesse' => $_POST['schliesse'] ?? null,
+        'merkmale' => $_POST['merkmale'] ?? null,
+        'wasserdicht' => $_POST['wasserdicht'] ?? null
     ];
 
     if (isset($_FILES['bild']) && $_FILES['bild']['error'] == 0) {
