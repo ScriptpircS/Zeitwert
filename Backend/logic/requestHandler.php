@@ -33,7 +33,7 @@ switch ($action) {
     case 'getProductsByCategory':
         require './handlers/productHandler.php';
         break;
-    
+
     //userHandler
     case 'getUserData':
     case 'listCustomers':
@@ -56,12 +56,13 @@ switch ($action) {
     case 'validateCoupon':
     case 'useCoupon':
         require './handlers/couponHandler.php';
-        break;    
+        break;
 
     //orderHandler    
     case 'placeOrder':
     case 'loadOrders':
     case 'loadOrderItems':
+    case 'getUserPaymentMethods':
         require './handlers/orderHandler.php';
         break;
 

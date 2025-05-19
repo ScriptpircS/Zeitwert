@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
   <meta charset="UTF-8">
   <title>Mein Konto</title>
@@ -11,7 +12,7 @@
   <script src="../js/navbar.js" defer></script>
   <script src="../js/account.js" defer></script>
   <script src="../js/main.js" defer></script>
-  
+
 </head>
 
 <body>
@@ -105,12 +106,22 @@
             <div class="tab-pane fade" id="zahlungTab">
               <form id="zahlungForm">
                 <div class="mb-3">
-                  <label class="form-label">Zahlungsinformationen</label>
-                  <input type="text" name="zahlungsinfo" class="form-control">
+                  <label class="form-label">Kreditkartennummer</label>
+                  <input type="text" name="cardNumber" class="form-control" placeholder="1234 5678 9012 3456" required>
+                </div>
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Ablaufdatum (MM/YY)</label>
+                    <input type="text" name="expiry" class="form-control" placeholder="MM/YY" required>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">CVC</label>
+                    <input type="text" name="cvc" class="form-control" placeholder="123" required>
+                  </div>
                 </div>
                 <div class="mb-3">
                   <label class="form-label">Passwort zur Bestätigung</label>
-                  <input type="password" name="password" class="form-control">
+                  <input type="password" name="password" class="form-control" required>
                 </div>
                 <button type="submit" class="btn btn-success">Zahlung speichern</button>
               </form>
@@ -145,4 +156,5 @@
     </div>
   </div>
 </body>
+
 </html>

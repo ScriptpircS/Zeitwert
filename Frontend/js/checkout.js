@@ -9,6 +9,7 @@ function checkLoginStatusAndLoadCheckout() {
       if (response.loggedIn) {
         ladeCheckoutWarenkorb();
         ladeNutzerdaten();
+        ladeZahlungsarten();
       } else {
         alert("Bitte melde dich zuerst an, um eine Bestellung abzuschließen.");
         window.location.href = "../../index.html";
@@ -50,10 +51,38 @@ function ladeNutzerdaten() {
       $("#street").val(user.adresse);
       $("#plz").val(user.plz);
       $("#ort").val(user.ort);
-      $("#payment_method").val(user.zahlungsinfo);
+      //$("#payment_method").val(user.zahlungsinfo);
     }
   }, "json");
 }
+
+function ladeZahlungsarten() {
+  $.post("../../Backend/logic/requestHandler.php", { action: "getPaymentMethods" }, function (response) {
+    const $container = $("#payment_methods").empty();
+    $container.append("<h2>Zahlungsinformationen:</h2>");
+
+    if (response.success && response.methods.length > 0) {
+      response.methods.forEach(method => {
+        const label = {
+          "Kreditkarte": "Kreditkarte",
+          "PayPal": "PayPal",
+          "Bankeinzug": "Bankeinzug"
+        }[method.type] || method.type;
+
+        const radio = `
+          <label>
+            <input type="radio" name="payment_method" value="${method.id}" required />
+            ${label} - ${method.details}
+          </label><br/>
+        `;
+        $container.append(radio);
+      });
+    } else {
+      $container.append("<p>Keine Zahlungsarten hinterlegt.</p>");
+    }
+  }, "json");
+}
+
 
 function validateCheckoutForm() {
   const requiredFields = ["#firstname", "#lastname", "#street", "#plz", "#ort", "#payment_method"];
@@ -111,7 +140,8 @@ $("#checkoutForm").on("submit", function (e) {
     plz: $("#plz").val(),
     ort: $("#ort").val(),
     country: $("#country").val(),
-    payment_method: $("#payment_method").val(),
+    //payment_method: $("#payment_method").val(),
+    payment_method: $("input[name='payment_method']:checked").val(),
     coupon_code: eingelösterGutschein ? eingelösterGutschein.code : null
   };
 

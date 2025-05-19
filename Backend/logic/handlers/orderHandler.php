@@ -1,5 +1,6 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) session_start();
+if (session_status() === PHP_SESSION_NONE)
+    session_start();
 
 require_once(__DIR__ . '/../../config/dbaccess.php');
 require_once(__DIR__ . '/../../models/user.class.php');
@@ -23,7 +24,8 @@ if ($action === 'placeOrder') {
             $username = $_SESSION['username'];
             $userResult = $userModel->getByEmailOrUsername($username);
 
-            if (count($userResult) !== 1) throw new Exception("Benutzerdaten konnten nicht geladen werden.");
+            if (count($userResult) !== 1)
+                throw new Exception("Benutzerdaten konnten nicht geladen werden.");
 
             $user = $userResult[0];
             $userId = $user['id'];
@@ -42,18 +44,31 @@ if ($action === 'placeOrder') {
 
                 if ($coupon && $coupon['status'] === 'offen' && $coupon['valid_until'] >= date('Y-m-d')) {
                     $totalAmount -= floatval($coupon['wert']);
-                    if ($totalAmount < 0) $totalAmount = 0;
+                    if ($totalAmount < 0)
+                        $totalAmount = 0;
                     $couponModel->markCouponAsUsed($code);
                 }
             }
 
             // Bestellung speichern
-            $sqlOrder = "INSERT INTO orders (user_id, total_price, order_date, status) 
-                         VALUES (:user_id, :total_price, NOW(), :status)";
+            $paymentMethodId = $_POST['payment_method'] ?? null;
+            if (!$paymentMethodId)
+                throw new Exception("Keine Zahlungsart gewählt.");
+
+            // Prüfen, ob Zahlungsart zum User gehört
+            $stmt = $pdo->prepare("SELECT id FROM payment_info WHERE id = ? AND user_id = ?");
+            $stmt->execute([$paymentMethodId, $userId]);
+            if ($stmt->rowCount() === 0) {
+                throw new Exception("Ungültige Zahlungsart.");
+            }
+
+            $sqlOrder = "INSERT INTO orders (user_id, total_price, order_date, status, payment_info_id) 
+                         VALUES (:user_id, :total_price, NOW(), :status, :payment_info_id)";
             $paramsOrder = [
                 ':user_id' => $userId,
                 ':total_price' => $totalAmount,
-                ':status' => 'pending'
+                ':status' => 'pending',
+                ':payment_info_id' => $paymentMethodId
             ];
 
             if (!$db->execute($sqlOrder, $paramsOrder)) {
@@ -93,7 +108,8 @@ elseif ($action === 'loadOrders') {
     try {
         $username = $_SESSION['username'];
         $userResult = $userModel->getByEmailOrUsername($username);
-        if (count($userResult) !== 1) throw new Exception("Benutzerdaten konnten nicht geladen werden.");
+        if (count($userResult) !== 1)
+            throw new Exception("Benutzerdaten konnten nicht geladen werden.");
 
         $user = $userResult[0];
         $userId = $user['id'];
@@ -141,6 +157,22 @@ elseif ($action === 'loadOrderItems') {
             $response['message'] = $e->getMessage();
         }
     }
+}
+
+// ===== Zahlungsmöglichkeiten anzeigen (nur eingeloggt) =====
+elseif ($action === 'getUserPaymentMethods') {
+    requireLogin();
+    $userId = $_SESSION['user_id'];
+
+    $stmt = $pdo->prepare("SELECT id, type, details FROM payment_info WHERE user_id = ?");
+    $stmt->execute([$userId]);
+    $methods = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    echo json_encode([
+        'success' => true,
+        'methods' => $methods
+    ]);
+    exit;
 }
 
 echo json_encode($response);

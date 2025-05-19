@@ -14,7 +14,6 @@ function loadOrders() {
   
           if (Object.keys(order).length === 0) {
             $("#noOrders").text("Es schaut so aus, als ob du noch keine Bestellungen bei Zeitwert getätigt hast.");
-            $("#order-count").text("0");
             return;
           }
   
