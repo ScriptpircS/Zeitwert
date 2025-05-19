@@ -1,5 +1,6 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) session_start();
+if (session_status() === PHP_SESSION_NONE)
+    session_start();
 
 require_once(__DIR__ . '/../../config/dbaccess.php');
 require_once(__DIR__ . '/../../models/user.class.php');
@@ -11,6 +12,7 @@ $response = ['success' => false];
 $action = $_POST['action'] ?? '';
 $userModel = new User();
 $username = $_SESSION['username'];
+$db = dbaccess::getInstance();
 
 // Benutzerdaten laden
 if ($action === 'getAccountData') {
@@ -86,6 +88,138 @@ elseif ($action === 'changePassword') {
                 $response['message'] = 'Fehler beim Passwort-Update.';
             }
         }
+    }
+}
+
+// Zahlungsmethoden anzeigen
+elseif ($action === 'loadPaymentMethods') {
+    requireLogin();
+
+    try {
+        $userResult = $userModel->getByEmailOrUsername($username);
+
+        if (count($userResult) !== 1) {
+            throw new Exception("Benutzerdaten konnten nicht geladen werden.");
+        }
+
+        $user = $userResult[0];
+        $userId = $user['id'];
+
+        $sql = "SELECT id, type, details FROM payment_methods WHERE user_id = ?";
+        $data = $db->select($sql, [$userId]);
+
+        $response['success'] = true;
+        $response['data'] = $data;
+    } catch (Exception $e) {
+        $response['message'] = $e->getMessage();
+    }
+}
+
+// Zahlungsmethode laden
+elseif ($action === 'getPaymentMethod') {
+    requireLogin();
+
+    $id = $_POST['paymentId'];
+
+    try {
+        $userResult = $userModel->getByEmailOrUsername($username);
+
+        if (count($userResult) !== 1) {
+            throw new Exception("Benutzerdaten konnten nicht geladen werden.");
+        }
+
+        $user = $userResult[0];
+        $userId = $user['id'];
+
+        $sql = "SELECT type, details FROM payment_methods WHERE user_id = ? AND id = ?";
+        $data = $db->select($sql, [$userId, $id]);
+
+        $response['success'] = true;
+        $response['data'] = $data;
+    } catch (Exception $e) {
+        $response['message'] = $e->getMessage();
+    }
+}
+
+// Neue Zahlungsmethode speichern
+elseif ($action === 'addPaymentMethod') {
+    requireLogin();
+
+    try {
+        $username = $_SESSION['username'];
+        $userResult = $userModel->getByEmailOrUsername($username);
+
+        if (count($userResult) !== 1) {
+            throw new Exception("Benutzer nicht gefunden.");
+        }
+
+        $user = $userResult[0];
+        $userId = $user['id'];
+
+        $type = trim($_POST['type'] ?? '');
+        $details = trim($_POST['details'] ?? '');
+
+        if (!$type || !$details) {
+            throw new Exception("Bitte alle Felder ausfüllen.");
+        }
+
+        $sql = "INSERT INTO payment_methods (user_id, type, details) VALUES (?, ?, ?)";
+        $db->execute($sql, [$userId, $type, $details]);
+
+        $response['success'] = true;
+    } catch (Exception $e) {
+        $response['success'] = false;
+        $response['message'] = $e->getMessage();
+    }
+}
+
+// Zahlungsmethode bearbeiten
+elseif ($action === 'updatePaymentMethod') {
+    requireLogin();
+
+    $username = $_SESSION['username'];
+    $userResult = $userModel->getByEmailOrUsername($username);
+
+    if (count($userResult) !== 1) {
+        throw new Exception("Benutzer nicht gefunden.");
+    }
+
+    $user = $userResult[0];
+    $userId = $user['id'];
+
+    $id = $_POST['paymentId'];
+    $type = $_POST['type'];
+    $details = $_POST['details'];
+
+    $sql = "UPDATE payment_methods SET type = ?, details = ? WHERE id = ? AND user_id = ?";
+    $db->execute($sql, [$type, $details, $id, $userId]);
+
+}
+
+// Zahlungsart löschen
+elseif ($action === 'deletePaymentMethod') {
+    requireLogin();
+
+    $id = $_POST['paymentId'];
+
+    try {
+        $username = $_SESSION['username'];
+        $userResult = $userModel->getByEmailOrUsername($username);
+
+        if (count($userResult) !== 1) {
+            throw new Exception("Benutzer nicht gefunden.");
+        }
+
+        $user = $userResult[0];
+        $userId = $user['id'];
+
+        $sql = "DELETE FROM payment_methods WHERE id = ? AND user_id = ?";
+        $db->execute($sql, [$id, $userId]);
+
+        $response['success'] = true;
+    } catch (Exception $e) {
+        $response['success'] = false;
+        $response['message'] = $e->getMessage();
     }
 }
 

@@ -65,7 +65,7 @@ switch ($action) {
     case 'placeOrder':
     case 'loadOrders':
     case 'loadOrderItems':
-    case 'getUserPaymentMethods':
+    case 'getPaymentMethods':
         require './handlers/orderHandler.php';
         break;
 
@@ -73,6 +73,10 @@ switch ($action) {
     case 'getAccountData':
     case 'updateAddress':
     case 'updatePayment':
+    case 'loadPaymentMethods':
+    case 'addPaymentMethod':
+    case 'updatePaymentMethod':
+    case 'deletePaymentMethod':
     case 'changePassword':
         require './handlers/accountHandler.php';
         break;

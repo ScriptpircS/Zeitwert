@@ -61,28 +61,22 @@ function ladeZahlungsarten() {
     const $container = $("#payment_methods").empty();
     $container.append("<h2>Zahlungsinformationen:</h2>");
 
-    if (response.success && response.methods.length > 0) {
-      response.methods.forEach(method => {
-        const label = {
-          "Kreditkarte": "Kreditkarte",
-          "PayPal": "PayPal",
-          "Bankeinzug": "Bankeinzug"
-        }[method.type] || method.type;
+    if (response.success && Array.isArray(response.methods) && response.methods.length > 0) {
+      const $select = $('<select class="form-select" name="payment_method" id="payment_method" required></select>');
+      $select.append('<option value="">Zahlungsmethode wählen</option>');
 
-        const radio = `
-          <label>
-            <input type="radio" name="payment_method" value="${method.id}" required />
-            ${label} - ${method.details}
-          </label><br/>
-        `;
-        $container.append(radio);
+      response.methods.forEach(method => {
+
+        const option = `<option value="${method.id}">${method.type}</option>`;
+        $select.append(option);
       });
+
+      $container.append($select);
     } else {
-      $container.append("<p>Keine Zahlungsarten hinterlegt.</p>");
+      $container.append("<p>Keine Zahlungsarten hinterlegt. Bitte lege eine Zahlungsart im Profil an!</p>");
     }
   }, "json");
 }
-
 
 function validateCheckoutForm() {
   const requiredFields = ["#firstname", "#lastname", "#street", "#plz", "#ort", "#payment_method"];
@@ -140,8 +134,7 @@ $("#checkoutForm").on("submit", function (e) {
     plz: $("#plz").val(),
     ort: $("#ort").val(),
     country: $("#country").val(),
-    //payment_method: $("#payment_method").val(),
-    payment_method: $("input[name='payment_method']:checked").val(),
+    payment_method: $("#payment_method").val(),
     coupon_code: eingelösterGutschein ? eingelösterGutschein.code : null
   };
 

@@ -24,6 +24,7 @@ function loadOrders() {
                 <th scope="row">${item.orderId}</th>
                 <td>${item.total_price}</td>
                 <td>${item.order_date}</td>
+                <td>${item.payment_type}</td>
                 <td>${item.status}</td>
                 <td>
                   <button class="btn btn-secondary btn-sm mt-2" onclick="loadOrderItems(${item.orderId})">Details</button>

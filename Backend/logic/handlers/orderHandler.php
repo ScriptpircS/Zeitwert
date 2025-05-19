@@ -56,9 +56,9 @@ if ($action === 'placeOrder') {
                 throw new Exception("Keine Zahlungsart gewählt.");
 
             // Prüfen, ob Zahlungsart zum User gehört
-            $stmt = $pdo->prepare("SELECT id FROM payment_info WHERE id = ? AND user_id = ?");
-            $stmt->execute([$paymentMethodId, $userId]);
-            if ($stmt->rowCount() === 0) {
+            $sql = "SELECT id FROM payment_methods WHERE id = ? AND user_id = ?";
+            $result = $db->select($sql, [$paymentMethodId, $userId]);
+            if (count($result) === 0) {
                 throw new Exception("Ungültige Zahlungsart.");
             }
 
@@ -114,10 +114,16 @@ elseif ($action === 'loadOrders') {
         $user = $userResult[0];
         $userId = $user['id'];
 
-        $sql = "SELECT id AS orderId, total_price, order_date, status 
-                FROM orders 
-                WHERE user_id = ? 
-                ORDER BY order_date DESC";
+        $sql = "SELECT 
+            o.id AS orderId, 
+            o.total_price, 
+            o.order_date, 
+            o.status, 
+            pm.type AS payment_type
+        FROM orders o
+        JOIN payment_methods pm ON o.payment_info_id = pm.id
+        WHERE o.user_id = ?
+        ORDER BY o.order_date DESC";
 
         $orders = $db->select($sql, [$userId]);
 
@@ -160,19 +166,28 @@ elseif ($action === 'loadOrderItems') {
 }
 
 // ===== Zahlungsmöglichkeiten anzeigen (nur eingeloggt) =====
-elseif ($action === 'getUserPaymentMethods') {
+elseif ($action === 'getPaymentMethods') {
     requireLogin();
-    $userId = $_SESSION['user_id'];
 
-    $stmt = $pdo->prepare("SELECT id, type, details FROM payment_info WHERE user_id = ?");
-    $stmt->execute([$userId]);
-    $methods = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    try {
+        $username = $_SESSION['username'];
+        $userResult = $userModel->getByEmailOrUsername($username);
 
-    echo json_encode([
-        'success' => true,
-        'methods' => $methods
-    ]);
-    exit;
+        if (count($userResult) !== 1) {
+            throw new Exception("Benutzerdaten konnten nicht geladen werden.");
+        }
+
+        $user = $userResult[0];
+        $userId = $user['id'];
+
+        $sql = "SELECT id, type, details FROM payment_methods WHERE user_id = ?";
+        $methods = $db->select($sql, [$userId]);
+
+        $response['success'] = true;
+        $response['methods'] = $methods;
+    } catch (Exception $e) {
+        $response['message'] = $e->getMessage();
+    }
 }
 
 echo json_encode($response);
