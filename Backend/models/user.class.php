@@ -101,6 +101,97 @@ class User {
     
         return null; // Benutzer nicht gefunden
     }
-    
+
+    public function getOrdersByUserId($userId) {
+    // 1. Alle Bestellungen des Nutzers laden
+    $sqlOrders = "
+        SELECT id, order_date, total_price, status
+        FROM orders
+        WHERE user_id = :userId
+        ORDER BY order_date DESC
+    ";
+    $orders = $this->db->select($sqlOrders, [':userId' => $userId]);
+
+    // 2. Für jede Bestellung die zugehörigen Artikel mit Produktdetails holen
+    foreach ($orders as &$order) {
+        $sqlItems = "
+            SELECT 
+                oi.id,
+                oi.product_id,
+                oi.menge AS quantity,
+                oi.preis AS price,
+                p.marke,
+                p.modell,
+                p.bild_url
+            FROM order_items oi
+            JOIN products p ON p.id = oi.product_id
+            WHERE oi.order_id = :orderId
+        ";
+
+        $items = $this->db->select($sqlItems, [':orderId' => $order['id']]);
+        $order['items'] = $items;
+    }
+
+    return $orders;
+}
+
+// === Orderitem löschen (ADMIN)
+public function deleteOrderItem($orderItemId) {
+    if (!$orderItemId || !is_numeric($orderItemId)) {
+        return false;
+    }
+
+    $sql = "DELETE FROM order_items WHERE id = :id";
+    return $this->db->execute($sql, [':id' => $orderItemId]);
+}
+
+// === Orderitem aktualisieren (ADMIN)
+public function updateOrderItemQuantity($itemId, $qty) {
+    if (!$itemId || !$qty || !is_numeric($qty) || $qty < 1) {
+        return false;
+    }
+
+    // Menge aktualisieren
+    $updateSuccess = $this->db->execute(
+        "UPDATE order_items SET menge = :qty WHERE id = :id",
+        [':qty' => $qty, ':id' => $itemId]
+    );
+
+    if (!$updateSuccess) {
+        return false;
+    }
+
+    // Gesamtpreis neu berechnen
+    $this->recalculateOrderTotalByItemId($itemId);
+
+    return true;
+}
+
+public function recalculateOrderTotalByItemId($orderItemId) {
+    $sql = "SELECT order_id FROM order_items WHERE id = :id";
+    $res = $this->db->select($sql, [':id' => $orderItemId]);
+
+    if (count($res) === 1) {
+        $orderId = $res[0]['order_id'];
+
+        $sumResult = $this->db->select(
+            "SELECT SUM(preis * menge) AS total FROM order_items WHERE order_id = :orderId",
+            [':orderId' => $orderId]
+        );
+
+        $newTotal = $sumResult[0]['total'] ?? 0;
+
+        $this->db->execute(
+            "UPDATE orders SET total_price = :total WHERE id = :orderId",
+            [
+                ':total' => $newTotal,
+                ':orderId' => $orderId
+            ]
+        );
+    }
+}
+
+
+
 }
 ?>

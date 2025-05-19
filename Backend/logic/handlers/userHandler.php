@@ -34,7 +34,7 @@ if ($action === 'getUserData') {
 }
 
 
-// ===== listCustomers (nur Admin) =====
+// ===== listCustomers (Admin) =====
 elseif ($action === 'listCustomers') {
     requireAdmin();
 
@@ -44,7 +44,7 @@ elseif ($action === 'listCustomers') {
 }
 
 
-// ===== toggleCustomer (nur Admin) =====
+// ===== toggleCustomer (Admin) =====
 elseif ($action === 'toggleCustomer') {
     requireAdmin();
 
@@ -61,6 +61,57 @@ elseif ($action === 'toggleCustomer') {
         $response['message'] = "Kunden-ID fehlt.";
     }
 }
+
+// ===== getCustomerOrders (Admin) =====
+elseif ($action === 'getCustomerOrders') {
+    requireAdmin();
+
+    $userId = $_POST['userId'] ?? null;
+    if (!$userId) {
+        $response['message'] = "Kunden-ID fehlt.";
+    } else {
+        $orders = $userModel->getOrdersByUserId($userId);
+        if ($orders !== null) {
+            $response['success'] = true;
+            $response['orders'] = $orders;
+        } else {
+            $response['message'] = "Keine Bestellungen gefunden.";
+        }
+    }
+}
+
+// ===== deleteOrderItem (Admin) =====
+elseif ($action === 'deleteOrderItem') {
+    requireAdmin();
+
+    $orderItemId = $_POST['orderItemId'] ?? null;
+
+    if ($orderItemId) {
+        if ($userModel->deleteOrderItem($orderItemId)) {
+            $response['success'] = true;
+            $response['message'] = "Produkt wurde gelöscht.";
+        } else {
+            $response['message'] = "Fehler beim Löschen des Produkts.";
+        }
+    } else {
+        $response['message'] = "Keine Positions-ID angegeben.";
+    }
+}
+
+// ===== updateOrderItemQuantity (Admin) =====
+elseif ($action === 'updateOrderItemQuantity') {
+    requireAdmin();
+
+    $itemId = $_POST['orderItemId'] ?? null;
+    $qty = $_POST['quantity'] ?? null;
+
+    if ($userModel->updateOrderItemQuantity($itemId, $qty)) {
+        $response['success'] = true;
+    } else {
+        $response['message'] = "Fehler beim Aktualisieren.";
+    }
+}
+
 
 echo json_encode($response);
 exit;

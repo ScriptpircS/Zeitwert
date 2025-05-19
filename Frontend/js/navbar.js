@@ -141,19 +141,19 @@ function protectPage({ requireLogin = false, requireAdmin = false }) {
     .then(res => res.json())
     .then(data => {
       if (!data.loggedIn && requireLogin) {
-        show404();
+        show403();
       } else if (requireAdmin && data.role !== "admin") {
-        show404();
+        show403();
       } else {
         document.body.style.visibility = "visible"; // Zugriff erlaubt
       }
     })
-    .catch(() => show404());
+    .catch(() => show403());
 }
 
-function show404() {
-  document.body.innerHTML = "<h1 style='text-align:center; margin-top:50px;'>❌ Fehler 404 – Seite nicht gefunden</h1>";
-  document.title = "404 - Nicht gefunden";
+function show403() {
+  document.body.innerHTML = "<h1 style='text-align:center; margin-top:50px;'>❌ Fehler 403 – Zugriff auf seite verweigert</h1>";
+  document.title = "403 - Forbidden";
   document.body.style.visibility = "visible";
 }
 
