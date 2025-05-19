@@ -13,9 +13,11 @@ function ladeWarenkorb() {
 
       const cart = response.cart;
       const $container = $("#warenkorbContainer").empty();
+      const $cocontainer = $("#checkoutContainer").empty();
 
       if (!cart || Object.keys(cart).length === 0) {
         $container.html("<p>🛒 Dein Warenkorb ist leer.</p>");
+        $cocontainer.html('<a href="../../index.html" class="btn btn-success mt-4" id="toIndex">Zu den Uhren</a>');
         $("#cart-count").text("0");
         return;
       }
@@ -53,6 +55,7 @@ function ladeWarenkorb() {
         `<div class="col-12"><hr><h4>🧾 Gesamtbetrag: € ${gesamtpreis.toFixed(2)}</h4></div>`
       );
 
+      $cocontainer.html('<a href="order.html" class="btn btn-success mt-4" id="toCheckout">Zur Kasse</a>');
       $("#cart-count").text(response.gesamtmenge);
     },
     error: function (xhr, status, error) {

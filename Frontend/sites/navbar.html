@@ -1,18 +1,32 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light px-4">
-  <a class="navbar-brand" href="#">Zeitwert</a>
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
 
-  <div class="collapse navbar-collapse">
+<!-- Responsive Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light px-4">
+  <a class="navbar-brand ms-2" href="#">
+    <img src="http://localhost/Zeitwert/Frontend/img/Logo1.png" alt="Zeitwert Logo" height="50">
+    <span class="fw-bold fs-4">Zeitwert</span>
+  </a>
+
+  <!-- ☰ Hamburger-Button für kleine Geräte -->
+  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Navigation ein-/ausblenden">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <!-- Menüpunkte -->
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <div class="navbar-nav ms-auto">
       <!-- Begrüßung -->
       <span id="welcomeUser" class="nav-link d-none"></span>
 
-      <!-- Alle Links -->
+      <!-- Hauptnavigation -->
       <a href="#" class="nav-link" id="registerLink">Registrieren</a>
       <a href="#" class="nav-link" id="loginLink">Login</a>
 
       <a href="#" class="nav-link d-flex align-items-center" id="Warenkorb">
         <div id="dropzone-warenkorb" class="dropzone">
-          🛒 <span id="cart-count" class="badge bg-primary ms-1">0</span><br>
+          🛒 <span id="cart-count" class="badge bg-primary ms-1">0</span>
         </div>
       </a>
 
@@ -24,7 +38,7 @@
       <a href="#" class="nav-link d-none" id="adminCustomersLink">Kunden</a>
       <a href="#" class="nav-link d-none" id="adminCouponsLink">Gutscheine</a>
 
-      <!-- Logout ganz am Ende -->
+      <!-- Logout -->
       <a href="#" class="nav-link d-none" id="logoutLink">Logout</a>
     </div>
   </div>
