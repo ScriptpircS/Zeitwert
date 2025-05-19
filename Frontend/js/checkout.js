@@ -118,6 +118,7 @@ $("#checkoutForm").on("submit", function (e) {
   $.post("../../Backend/logic/requestHandler.php", bestellDaten, function (response) {
     if (response.success) {
       alert("Bestellung erfolgreich!");
+      fetchCartCount();
       $('#checkoutBody').html("<h1>Bestellung aufgegeben!</h1>");
     } else {
       alert("Fehler bei Bestellung: " + response.message);

@@ -400,6 +400,9 @@ function renderAdminProducts(products) {
   
   // Bestellungen eines Kunden anzeigen
   function viewOrders(customerId) {
+
+    window.currentCustomerId = customerId;
+    
     $.ajax({
       url: "http://localhost/Zeitwert/Backend/logic/requestHandler.php",
       type: "POST",
@@ -418,26 +421,140 @@ function renderAdminProducts(products) {
     });
   }
   
-  // Bestellungen darstellen
-  function showOrders(orders) {
-    let html = '<h4>Bestellungen</h4>';
-    if (orders.length === 0) {
-      html += '<p>Keine Bestellungen vorhanden.</p>';
-    } else {
-      html += '<ul class="list-group">';
-      orders.forEach(o => {
+function showOrders(orders) {
+  let html = '<h4>📦 Bestellungen</h4>';
+
+  if (!orders || orders.length === 0) {
+    html += '<p>Keine Bestellungen vorhanden.</p>';
+  } else {
+    orders.forEach(order => {
+      html += `
+        <div class="card mb-4">
+          <div class="card-header bg-light">
+            <strong>Bestellnr.:</strong> ${order.id} |
+            <strong>Datum:</strong> ${order.order_date} |
+            <strong>Status:</strong> ${order.status}
+          </div>
+          <div class="card-body">
+      `;
+
+      if (order.items && order.items.length > 0) {
+        html += '<div class="row g-3">';
+
+        order.items.forEach(item => {
+          const gesamt = item.quantity * item.price;
+          const produktname = `${item.marke} ${item.modell}`;
+          const bildUrl = `/Zeitwert/Backend/productpictures/${item.bild_url || 'fallback.jpg'}`;
+
+          html += `
+            <div class="col-md-6">
+              <div class="border rounded p-3 d-flex">
+                <img src="${bildUrl}" alt="${produktname}" style="width: 100px; height: auto; margin-right: 15px;">
+                <div>
+                  <h5>${produktname}</h5>
+                  <div class="mb-2">
+                    <label>Menge:</label>
+                    <input type="number" min="1" value="${item.quantity}" 
+                        id="qty-${item.id}" style="width: 60px;" />
+                    <button class="btn btn-sm btn-outline-success" onclick="confirmQuantity(${item.id})">✔️</button>
+
+                  </div>
+                  <p><strong>Gesamt: €${gesamt.toFixed(2)}</strong></p>
+                  <button class="btn btn-sm btn-danger" onclick="deleteOrderItem(${item.id})">🗑️ Löschen</button>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+
+        html += '</div>';
+
         html += `
-          <li class="list-group-item">
-            <strong>Bestellnr.:</strong> ${o.id} |
-            <strong>Datum:</strong> ${o.order_date} |
-            <strong>Summe:</strong> €${parseFloat(o.total_price).toFixed(2)} |
-            <strong>Status:</strong> ${o.status}
-          </li>
+          <div class="mt-3 text-end">
+            <strong>🧾 Gesamtbetrag: €${parseFloat(order.total_price)}</strong>
+          </div>
         `;
-      });
-      html += '</ul>';
-    }
-    $("#orderContainer").html(html);
+      } else {
+        html += '<p class="text-muted">Keine Produkte in dieser Bestellung.</p>';
+      }
+
+      html += '</div></div>'; 
+    });
   }
+
+  $("#orderContainer").html(html);
+}
+
+function deleteOrderItem(orderItemId) {
+  if (!confirm("Möchtest du dieses Produkt wirklich dauerhaft löschen?")) return;
+
+  $.ajax({
+    url: "http://localhost/Zeitwert/Backend/logic/requestHandler.php",
+    type: "POST",
+    data: {
+      action: "deleteOrderItem",
+      orderItemId: orderItemId
+    },
+    dataType: "json",
+    success: function (response) {
+      if (response.success) {
+        alert("Produkt wurde gelöscht.");
+        viewOrders(currentCustomerId); // Bestellungen neu laden
+      } else {
+        alert("Fehler: " + (response.message || "Aktion fehlgeschlagen."));
+      }
+    },
+    error: function (xhr, status, error) {
+      console.error("AJAX Fehler:", error);
+      alert("Beim Löschen ist ein Fehler aufgetreten.");
+    }
+  });
+}
+
+function updateOrderItemQuantity(orderItemId, quantity) {
+  quantity = parseInt(quantity);
+  if (isNaN(quantity) || quantity < 1) {
+    alert("Ungültige Menge.");
+    return;
+  }
+
+  $.ajax({
+    url: "http://localhost/Zeitwert/Backend/logic/requestHandler.php",
+    type: "POST",
+    data: {
+      action: "updateOrderItemQuantity",
+      orderItemId: orderItemId,
+      quantity: quantity
+    },
+    dataType: "json",
+    success: function (response) {
+      if (response.success) {
+        alert("Menge wurde aktualisiert");
+        viewOrders(currentCustomerId); 
+      } else {
+        alert("Fehler: " + (response.message || "Aktualisierung fehlgeschlagen"));
+      }
+    },
+    error: function () {
+      alert("Fehler beim Aktualisieren der Menge.");
+    }
+  });
+}
+
+function confirmQuantity(orderItemId) {
+  const input = document.getElementById(`qty-${orderItemId}`);
+  if (!input) return;
+
+  const quantity = parseInt(input.value);
+  if (isNaN(quantity) || quantity < 1) {
+    alert("Bitte gib eine gültige Menge ein.");
+    return;
+  }
+
+  updateOrderItemQuantity(orderItemId, quantity);
+}
+
+
+
   
 
