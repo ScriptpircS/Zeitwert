@@ -28,4 +28,24 @@
     color: gold;
   }
   
-  
+  .bg-light {
+    --bs-bg-opacity: 1;
+    background-color: rgb(172 214 255) !important;
+}
+
+/* Schriftart für Navbar */
+.navbar, .navbar a, .navbar .nav-link, .navbar-brand {
+  font-family: 'Montserrat', sans-serif;
+}
+
+body {
+  background-color: #f2fbff;
+}
+
+form {
+  background-color: #f8f9fa;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 100%; 
+  max-width: 400px; 
+}
