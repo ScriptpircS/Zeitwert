@@ -207,13 +207,22 @@ function renderAdminProducts(products) {
   // ========== GUTSCHEINE ADMIN - CREATE ==========
   function showCreateCouponForm() {
     $('#contentArea').html(`
-        <h3>Neuen Gutschein erstellen</h3>
-        <form id="createCouponForm">
-            <input class="form-control mb-2" type="number" name="wert" placeholder="Wert in €" required step="0.01">
-            <input class="form-control mb-2" type="date" name="valid_until" required>
-            <button class="btn btn-success" type="submit">Erstellen</button>
-        </form>
+      <div class="col-12 d-flex justify-content-center">
+        <div class="bg-white shadow-sm p-4 rounded" style="max-width: 400px; width: 100%;">
+          <h4 class="mb-3 text-center">Neuen Gutschein erstellen</h4>
+          <form id="createCouponForm">
+            <div class="mb-3">
+              <input class="form-control" type="number" name="wert" placeholder="Wert in €" required step="0.01">
+            </div>
+            <div class="mb-3">
+              <input class="form-control" type="date" name="valid_until" required>
+            </div>
+            <button class="btn btn-success w-100" type="submit">Erstellen</button>
+          </form>
+        </div>
+      </div>
     `);
+    
   
     $('#createCouponForm').submit(function (e) {
       e.preventDefault();
