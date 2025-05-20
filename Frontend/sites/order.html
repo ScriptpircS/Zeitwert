@@ -12,7 +12,7 @@
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-  <script>window.accessRules = { requireLogin: true, requireAdmin: false };</script>
+  <script>window.accessRules = { requireLogin: false, requireAdmin: false };</script>
   <script defer src="../js/navbar.js"></script>
   <script defer src="../js/cart.js"></script>
   <script defer src="../js/checkout.js"></script>
@@ -21,17 +21,17 @@
 </head>
 
 <body class="d-flex flex-column min-vh-100">
-  <!-- Navbar wird per JS geladen -->
 
   <main class="container py-5 flex-grow-1" style="max-width: 600px;">
 
+    <div id="checkoutBody">
     <form id="checkoutForm" method="POST">
         <h1 class="h3 mb-4 fw-normal text-center">Checkout</h1>
       <!-- Produkte -->
       <div class="mb-4">
         <h2 class="h5">Ihre Produkte</h2>
         <ul id="checkoutCartSummary" class="list-group mb-2">
-          <!-- JS befüllt <li> -->
+          <!-- Produktliste <li> -->
         </ul>
         <div id="checkoutPrice" class="fw-bold">Gesamt:</div>
       </div>
@@ -114,9 +114,9 @@
         Bestellung abschließen
       </button>
     </form>
+    </div>
   </main>
 
-  <!-- Footer wird automatisch durch JS eingefügt -->
 </body>
 
 </html>
