@@ -6,9 +6,9 @@ function ladeWarenkorb() {
     dataType: "json",
     success: function (response) {
 
-      if (!response.success) {
+      if(!response.success) {
         $("#warenkorbContainer").html("<p>Fehler beim Laden des Warenkorbs.</p>");
-        return;
+      return;
       }
 
       const cart = response.cart;

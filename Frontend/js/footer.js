@@ -7,7 +7,7 @@ function getPrefix() {
   
   function loadFooter() {
     const prefix = getPrefix();
-    const footerPath = prefix + "Frontend/sites/footer.html"; // 📍 hier ist dein Footer
+    const footerPath = prefix + "Frontend/sites/footer.html";
   
     fetch(footerPath)
       .then(res => res.text())

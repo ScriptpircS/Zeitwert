@@ -30,16 +30,16 @@
   
   .bg-light {
     --bs-bg-opacity: 1;
-    background-color: rgb(172 214 255) !important;
+    background-color: 	#F4E9DC !important;
 }
 
 /* Schriftart für Navbar */
-.navbar, .navbar a, .navbar .nav-link, .navbar-brand {
-  font-family: 'Montserrat', sans-serif;
+.navbar, .navbar a, .navbar .nav-link, .navbar-brand, .navbar-brand ms-2 {
+  font-family: 'Montserrat', sans-serif, 	#3B2A1C;
 }
 
 body {
-  background-color: #f2fbff;
+  background-color: #FAF3EC;
 }
 
 form {
@@ -48,4 +48,17 @@ form {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   width: 100%; 
   max-width: 400px; 
+}
+
+.custom-footer {
+  background-color: #3B2A1C;
+}
+
+.custom-footer a {
+  color: #F4E9DC;
+}
+
+.custom-footer a:hover {
+  color: #ffffff;
+  text-decoration: underline;
 }
