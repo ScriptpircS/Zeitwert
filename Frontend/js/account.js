@@ -11,6 +11,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
   $("#zahlungForm").on("submit", function (e) {
     e.preventDefault();
+
+    if ($("#neueZahlungsartForm").is(":visible")) {
+      speichereNeueZahlungsmethode();
+    } else if ($("#aendereZahlungsartForm").is(":visible")) {
+      speichereBearbeiteteZahlungsart();
+    } else {
+      alert("Bitte zuerst eine neue Zahlungsart hinzufügen oder eine vorhandene bearbeiten.");
+    }
   });
 
   $("#passwortForm").on("submit", function (e) {
@@ -109,7 +117,6 @@ function zeigeUpdateMessage(message, success) {
     .css("color", success ? "green" : "red");
 }
 
-
 // Zahlungsarten laden
 function ladeZahlungsarten() {
   $.post("../../Backend/logic/requestHandler.php", { action: "loadPaymentMethods" }, function (response) {
@@ -153,22 +160,22 @@ function ladeZahlungsarten() {
   }, "json");
 }
 
-
-// Zahlungsart hinzufügen
+// Neue Zahlungsart anzeigen
 function zeigeNeueZahlungsartForm() {
   $("#neueZahlungsartForm").toggle();
 }
 
+// Neue Zahlungsart speichern
 function speichereNeueZahlungsmethode() {
   const type = $("#payment_type").val();
   const details = $("#payment_details").val();
   const password = $("#zahlungForm input[name='password']").val();
 
   if (!type || !details) {
-    alert("Bitte Zahlungsart und Details angeben.");
+    zeigeUpdateMessage("Bitte Zahlungsart und Details angeben.", false);
     return;
   } else if (!password) {
-    alert("Bitte Passwort eingeben.");
+    zeigeUpdateMessage("Bitte Passwort eingeben.", false);
     return;
   }
 
@@ -178,24 +185,22 @@ function speichereNeueZahlungsmethode() {
     details,
     password
   }, function (response) {
+    zeigeUpdateMessage(response.success ? "Zahlungsmethode gespeichert." : "Fehler: " + response.message, response.success);
     if (response.success) {
-      alert("Zahlungsmethode gespeichert.");
       $("#neueZahlungsartForm").hide();
       $("#payment_type").val("");
       $("#payment_details").val("");
-      ladeZahlungsarten(); // Tabelle neu laden
-    } else {
-      alert("Fehler: " + response.message);
+      ladeZahlungsarten();
     }
   }, "json");
 }
 
-
-// Zahlungsart bearbeiten
+// Zahlungsart bearbeiten (vorladen)
 let bearbeitePaymentId = null;
 function aendereZahlungsart(paymentId) {
   const password = $("#zahlungForm input[name='password']").val();
   bearbeitePaymentId = paymentId;
+
   $.post("../../Backend/logic/requestHandler.php", {
     action: "getPaymentMethod",
     paymentId: paymentId,
@@ -204,23 +209,24 @@ function aendereZahlungsart(paymentId) {
     if (response.success && response.data) {
       const daten = response.data[0];
       $("#aendereZahlungsartForm").show();
-      $("#neueZahlungsartForm").hide(); // Neues Formular verstecken
+      $("#neueZahlungsartForm").hide();
 
       $("#updated_payment_type").val(daten.type);
       $("#updated_payment_details").val(daten.details);
     } else {
-      alert("Fehler beim Laden der Zahlungsart: " + response.message);
+      zeigeUpdateMessage("Fehler beim Laden der Zahlungsart: " + response.message, false);
     }
   }, "json");
 }
 
+// Bearbeitete Zahlungsart speichern
 function speichereBearbeiteteZahlungsart() {
   const updatedType = $("#updated_payment_type").val();
   const updatedDetails = $("#updated_payment_details").val();
   const password = $("#zahlungForm input[name='password']").val();
 
   if (!updatedType || !updatedDetails || bearbeitePaymentId === null) {
-    alert("Bitte Zahlungsart, Details und Passwort eingeben.");
+    zeigeUpdateMessage("Bitte Zahlungsart, Details und Passwort eingeben.", false);
     return;
   }
 
@@ -231,17 +237,14 @@ function speichereBearbeiteteZahlungsart() {
     details: updatedDetails,
     password
   }, function (response) {
+    zeigeUpdateMessage(response.success ? "Zahlungsart aktualisiert." : "Fehler: " + response.message, response.success);
     if (response.success) {
-      alert("Zahlungsart aktualisiert.");
       $("#aendereZahlungsartForm").hide();
       bearbeitePaymentId = null;
       ladeZahlungsarten();
-    } else {
-      alert("Fehler beim Aktualisieren: " + response.message);
     }
   }, "json");
 }
-
 
 // Zahlungsart löschen
 function loescheZahlungsart(paymentId) {
@@ -249,19 +252,18 @@ function loescheZahlungsart(paymentId) {
   if (confirm("Bist du dir wirklich sicher? Dies kann nicht rückgängig gemacht werden")) {
 
     if (!password) {
-      alert("Bitte Passwort eingeben.");
+      zeigeUpdateMessage("Bitte Passwort eingeben.", false);
       return;
     }
+
     $.post("../../Backend/logic/requestHandler.php", {
       action: "deletePaymentMethod",
       paymentId,
       password
     }, function (response) {
+      zeigeUpdateMessage(response.success ? "Zahlungsmethode gelöscht." : "Fehler beim Löschen: " + response.message, response.success);
       if (response.success) {
-        alert("Zahlungsmethode geslöscht.");
-        ladeZahlungsarten(); // Tabelle neu laden
-      } else {
-        alert("Fehler beim löschen: " + response.message);
+        ladeZahlungsarten();
       }
     }, "json");
   }
