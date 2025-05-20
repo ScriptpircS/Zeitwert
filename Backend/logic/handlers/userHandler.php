@@ -26,7 +26,6 @@ if ($action === 'getUserData') {
             'adresse' => $userData[0]['adresse'],
             'plz' => $userData[0]['plz'],
             'ort' => $userData[0]['ort'],
-            'zahlungsinfo' => $userData[0]['zahlungsinfo'],
         ];
     } else {
         $response['message'] = "Benutzerdaten konnten nicht gefunden werden.";

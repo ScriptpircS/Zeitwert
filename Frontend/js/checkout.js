@@ -57,7 +57,6 @@ function ladeNutzerdaten() {
       $("#street").val(user.adresse);
       $("#plz").val(user.plz);
       $("#ort").val(user.ort);
-      //$("#payment_method").val(user.zahlungsinfo);
     }
   }, "json");
 }
@@ -79,7 +78,7 @@ function ladeZahlungsarten() {
 
       $container.append($select);
     } else {
-      $container.append("<p>Keine Zahlungsarten hinterlegt. Bitte lege eine Zahlungsart im Profil an!</p>");
+      $container.append('<p>Keine Zahlungsarten hinterlegt. Bitte lege eine Zahlungsart im Profil an!</p><br><a href="account.html" class="btn btn-primary">Zum Account</a>');
     }
   }, "json");
 }
