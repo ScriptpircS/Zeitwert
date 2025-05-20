@@ -11,8 +11,14 @@ function checkLoginStatusAndLoadCheckout() {
         ladeNutzerdaten();
         ladeZahlungsarten();
       } else {
-        alert("Bitte melde dich zuerst an, um eine Bestellung abzuschließen.");
-        window.location.href = "../../index.html";
+        $("#checkoutBody").html(`
+          <div class="alert alert-warning text-center">
+            🔐 Du bist nicht eingeloggt.<br>Bitte melde dich an, um deine Bestellung abzuschließen.
+          </div>
+          <div class="text-center mt-4">
+            <a href="login.html" class="btn btn-primary">Jetzt einloggen</a>
+          </div>
+        `);
       }
     },
     error: function () {

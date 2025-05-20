@@ -20,12 +20,11 @@
 </head>
 
 <body class="d-flex flex-column min-vh-100">
-  <!-- Navbar wird durch JS geladen -->
 
   <main class="container my-5 flex-grow-1">
     <h2 class="mb-4">Mein Konto</h2>
 
-    <!-- Account-Card -->
+    <!-- Account-Daten -->
     <div class="card shadow p-4">
       <div class="card-body">
         <h5 class="card-title">Deine Informationen</h5>
@@ -47,7 +46,7 @@
     <div id="updateMessage" class="mt-3"></div>
   </main>
 
-  <!-- Modal (Adresse / Zahlung / Passwort ändern) -->
+   <!-- Modal Adress-/Zahlungs-/Passwort-Änderung) -->
   <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
       <div class="modal-content">
@@ -112,6 +111,7 @@
             <div class="tab-pane fade" id="zahlungTab">
               <form id="zahlungForm">
                 <div class="mb-3">
+ 
                   <!-- Hier Table laden mit Type, Bearbeiten und Löschen -->
                   <table class="table table-striped">
                     <thead>
@@ -164,7 +164,17 @@
                 <div class="col-12 mt-2">
                   <label class="form-label">Passwort zur Bestätigung</label>
                   <input type="password" name="password" class="form-control">
+            
+
+                  <label class="form-label">Zahlungsinformationen</label>
+                  <input type="text" name="zahlungsinfo" class="form-control">
                 </div>
+                <div class="mb-3">
+                  <label class="form-label">Passwort zur Bestätigung</label>
+                  <input type="password" name="password" class="form-control">
+                </div>
+                <button type="submit" class="btn btn-success">Zahlung speichern</button>
+
               </form>
             </div>
 
