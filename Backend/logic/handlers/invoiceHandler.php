@@ -41,6 +41,10 @@ $sqlItems = "
 ";
 $items = $db->select($sqlItems, [':orderId' => $orderId]);
 
+// Zahlungsmethode laden
+$sqlPayment = "SELECT pm.type, pm.details FROM orders o JOIN payment_methods pm ON o.payment_info_id = pm.id WHERE o.id = :orderId";
+$paymentInfo = $db->selectSingle($sqlPayment, [':orderId' => $orderId]);
+
 // PDF vorbereiten
 $invoiceNumber = 'RE-' . str_pad($orderId, 6, '0', STR_PAD_LEFT);
 $orderDate = date('d.m.Y', strtotime($order['order_date']));
@@ -50,6 +54,9 @@ $html = "
 <h1>Rechnung</h1>
 <p><strong>Rechnungsnummer:</strong> $invoiceNumber<br>
 <strong>Datum:</strong> $orderDate</p>
+
+<p><strong>Zahlungsmethode:</strong> {$paymentInfo['type']}<br>
+<strong>Zahlungsdetails:</strong> {$paymentInfo['details']}</p>
 
 <p><strong>Kunde:</strong><br>
 {$user['anrede']} {$user['vorname']} {$user['nachname']}<br>

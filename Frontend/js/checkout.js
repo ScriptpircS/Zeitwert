@@ -9,6 +9,7 @@ function checkLoginStatusAndLoadCheckout() {
       if (response.loggedIn) {
         ladeCheckoutWarenkorb();
         ladeNutzerdaten();
+        ladeZahlungsarten();
       } else {
         $("#checkoutBody").html(`
           <div class="alert alert-warning text-center">
@@ -56,7 +57,29 @@ function ladeNutzerdaten() {
       $("#street").val(user.adresse);
       $("#plz").val(user.plz);
       $("#ort").val(user.ort);
-      $("#payment_method").val(user.zahlungsinfo);
+      //$("#payment_method").val(user.zahlungsinfo);
+    }
+  }, "json");
+}
+
+function ladeZahlungsarten() {
+  $.post("../../Backend/logic/requestHandler.php", { action: "getPaymentMethods" }, function (response) {
+    const $container = $("#payment_methods").empty();
+    $container.append("<h2 class="h5">Zahlungsinformationen:</h2>");
+
+    if (response.success && Array.isArray(response.methods) && response.methods.length > 0) {
+      const $select = $('<select class="form-select" name="payment_method" id="payment_method" required></select>');
+      $select.append('<option value="">Zahlungsmethode wählen</option>');
+
+      response.methods.forEach(method => {
+
+        const option = `<option value="${method.id}">${method.type}</option>`;
+        $select.append(option);
+      });
+
+      $container.append($select);
+    } else {
+      $container.append("<p>Keine Zahlungsarten hinterlegt. Bitte lege eine Zahlungsart im Profil an!</p>");
     }
   }, "json");
 }

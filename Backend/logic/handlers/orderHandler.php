@@ -1,5 +1,6 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) session_start();
+if (session_status() === PHP_SESSION_NONE)
+    session_start();
 
 require_once(__DIR__ . '/../../config/dbaccess.php');
 require_once(__DIR__ . '/../../models/user.class.php');
@@ -23,7 +24,8 @@ if ($action === 'placeOrder') {
             $username = $_SESSION['username'];
             $userResult = $userModel->getByEmailOrUsername($username);
 
-            if (count($userResult) !== 1) throw new Exception("Benutzerdaten konnten nicht geladen werden.");
+            if (count($userResult) !== 1)
+                throw new Exception("Benutzerdaten konnten nicht geladen werden.");
 
             $user = $userResult[0];
             $userId = $user['id'];
@@ -42,18 +44,31 @@ if ($action === 'placeOrder') {
 
                 if ($coupon && $coupon['status'] === 'offen' && $coupon['valid_until'] >= date('Y-m-d')) {
                     $totalAmount -= floatval($coupon['wert']);
-                    if ($totalAmount < 0) $totalAmount = 0;
+                    if ($totalAmount < 0)
+                        $totalAmount = 0;
                     $couponModel->markCouponAsUsed($code);
                 }
             }
 
             // Bestellung speichern
-            $sqlOrder = "INSERT INTO orders (user_id, total_price, order_date, status) 
-                         VALUES (:user_id, :total_price, NOW(), :status)";
+            $paymentMethodId = $_POST['payment_method'] ?? null;
+            if (!$paymentMethodId)
+                throw new Exception("Keine Zahlungsart gewählt.");
+
+            // Prüfen, ob Zahlungsart zum User gehört
+            $sql = "SELECT id FROM payment_methods WHERE id = ? AND user_id = ?";
+            $result = $db->select($sql, [$paymentMethodId, $userId]);
+            if (count($result) === 0) {
+                throw new Exception("Ungültige Zahlungsart.");
+            }
+
+            $sqlOrder = "INSERT INTO orders (user_id, total_price, order_date, status, payment_info_id) 
+                         VALUES (:user_id, :total_price, NOW(), :status, :payment_info_id)";
             $paramsOrder = [
                 ':user_id' => $userId,
                 ':total_price' => $totalAmount,
-                ':status' => 'pending'
+                ':status' => 'pending',
+                ':payment_info_id' => $paymentMethodId
             ];
 
             if (!$db->execute($sqlOrder, $paramsOrder)) {
@@ -93,15 +108,22 @@ elseif ($action === 'loadOrders') {
     try {
         $username = $_SESSION['username'];
         $userResult = $userModel->getByEmailOrUsername($username);
-        if (count($userResult) !== 1) throw new Exception("Benutzerdaten konnten nicht geladen werden.");
+        if (count($userResult) !== 1)
+            throw new Exception("Benutzerdaten konnten nicht geladen werden.");
 
         $user = $userResult[0];
         $userId = $user['id'];
 
-        $sql = "SELECT id AS orderId, total_price, order_date, status 
-                FROM orders 
-                WHERE user_id = ? 
-                ORDER BY order_date DESC";
+        $sql = "SELECT 
+            o.id AS orderId, 
+            o.total_price, 
+            o.order_date, 
+            o.status, 
+            pm.type AS payment_type
+        FROM orders o
+        JOIN payment_methods pm ON o.payment_info_id = pm.id
+        WHERE o.user_id = ?
+        ORDER BY o.order_date DESC";
 
         $orders = $db->select($sql, [$userId]);
 
@@ -140,6 +162,31 @@ elseif ($action === 'loadOrderItems') {
         } catch (Exception $e) {
             $response['message'] = $e->getMessage();
         }
+    }
+}
+
+// ===== Zahlungsmöglichkeiten anzeigen (nur eingeloggt) =====
+elseif ($action === 'getPaymentMethods') {
+    requireLogin();
+
+    try {
+        $username = $_SESSION['username'];
+        $userResult = $userModel->getByEmailOrUsername($username);
+
+        if (count($userResult) !== 1) {
+            throw new Exception("Benutzerdaten konnten nicht geladen werden.");
+        }
+
+        $user = $userResult[0];
+        $userId = $user['id'];
+
+        $sql = "SELECT id, type, details FROM payment_methods WHERE user_id = ?";
+        $methods = $db->select($sql, [$userId]);
+
+        $response['success'] = true;
+        $response['methods'] = $methods;
+    } catch (Exception $e) {
+        $response['message'] = $e->getMessage();
     }
 }
 
