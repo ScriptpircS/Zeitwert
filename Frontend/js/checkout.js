@@ -65,7 +65,7 @@ function ladeNutzerdaten() {
 function ladeZahlungsarten() {
   $.post("../../Backend/logic/requestHandler.php", { action: "getPaymentMethods" }, function (response) {
     const $container = $("#payment_methods").empty();
-    $container.append("<h2 class="h5">Zahlungsinformationen:</h2>");
+    $container.append('<h2 class="h5">Zahlungsinformationen:</h2>');
 
     if (response.success && Array.isArray(response.methods) && response.methods.length > 0) {
       const $select = $('<select class="form-select" name="payment_method" id="payment_method" required></select>');
