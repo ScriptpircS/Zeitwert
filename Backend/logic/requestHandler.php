@@ -75,6 +75,7 @@ switch ($action) {
     case 'updatePayment':
     case 'loadPaymentMethods':
     case 'addPaymentMethod':
+    case 'getPaymentMethod':
     case 'updatePaymentMethod':
     case 'deletePaymentMethod':
     case 'changePassword':

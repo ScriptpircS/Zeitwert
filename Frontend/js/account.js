@@ -2,6 +2,7 @@
 
 document.addEventListener("DOMContentLoaded", function () {
   ladeBenutzerdaten();
+  ladeZahlungsarten();
 
   $("#adresseForm").on("submit", function (e) {
     e.preventDefault();
@@ -10,7 +11,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   $("#zahlungForm").on("submit", function (e) {
     e.preventDefault();
-    speichereZahlung();
   });
 
   $("#passwortForm").on("submit", function (e) {
@@ -39,16 +39,6 @@ function ladeBenutzerdaten() {
       $("#adresseForm input[name='adresse']").val(data.adresse);
       $("#adresseForm input[name='plz']").val(data.plz);
       $("#adresseForm input[name='ort']").val(data.ort);
-
-      /*if (data.paymentMethods && Array.isArray(data.paymentMethods)) {
-        const $select = $("#paymentMethodSelect");
-        $select.empty();
-        data.paymentMethods.forEach(method => {
-          const selected = data.zahlungsinfo_id === method.id ? 'selected' : '';
-          $select.append(`<option value="${method.id}" ${selected}>${method.info}</option>`);
-        });
-      }*/
-      ladeZahlungsarten();
 
     } else {
       zeigeUpdateMessage("Fehler beim Laden der Benutzerdaten: " + response.message, false);
@@ -85,32 +75,6 @@ function speichereAdresse() {
   }, "json");
 }
 
-function speichereZahlung() {
-  const cardNumber = $("input[name='cardNumber']").val().replace(/\s+/g, '');
-  const expiry = $("input[name='expiry']").val();
-  const cvc = $("input[name='cvc']").val();
-  const password = $("#zahlungForm input[name='password']").val();
-
-  if (!cardNumber || !expiry || !cvc || !password) {
-    zeigeUpdateMessage("Bitte alle Zahlungsdaten und das Passwort eingeben!", false);
-    return;
-  }
-
-  // Nur die letzten 4 Ziffern speichern
-  const last4 = cardNumber.slice(-4);
-
-  $.post("../../Backend/logic/requestHandler.php", {
-    action: "updatePayment",
-    password: password,
-    newData: { zahlungsinfo: last4 }
-  }, function (response) {
-    zeigeUpdateMessage(response.success ? "Zahlungsdaten gespeichert!" : "Fehler: " + response.message, response.success);
-    if (response.success) ladeBenutzerdaten();
-  }, "json");
-}
-
-
-
 // Passwort ändern
 function aenderePasswort() {
   const currentPassword = $("input[name='current_password']").val();
@@ -146,6 +110,7 @@ function zeigeUpdateMessage(message, success) {
     .css("color", success ? "green" : "red");
 }
 
+
 // Zahlungsarten laden
 function ladeZahlungsarten() {
   $.post("../../Backend/logic/requestHandler.php", { action: "loadPaymentMethods" }, function (response) {
@@ -162,7 +127,7 @@ function ladeZahlungsarten() {
           const $row = $(`
             <tr>
               <td>${item.type}</td>
-              <td>${item.details};</td>
+              <td>${item.details}</td>
               <td>
                 <button class="btn btn-outline-primary btn-sm me-2" onclick="aendereZahlungsart(${item.id})">Bearbeiten</button>
                 <button class="btn btn-outline-danger btn-sm" onclick="loescheZahlungsart(${item.id})">Löschen</button>
@@ -173,7 +138,6 @@ function ladeZahlungsarten() {
         });
       }
 
-      // Button zum Hinzufügen (Formular bleibt erhalten)
       const $addButton = $(`
         <button class="btn btn-success" onclick="zeigeNeueZahlungsartForm()">Neue Zahlungsart hinzufügen</button>
       `);
@@ -191,20 +155,24 @@ function zeigeNeueZahlungsartForm() {
   $("#neueZahlungsartForm").toggle();
 }
 
-
 function speichereNeueZahlungsmethode() {
   const type = $("#payment_type").val();
   const details = $("#payment_details").val();
-  
+  const password = $("#zahlungForm input[name='password']").val();
+
   if (!type || !details) {
     alert("Bitte Zahlungsart und Details angeben.");
     return;
+  } else if (!password) {
+    alert("Bitte Passwort eingeben.");
+    return;
   }
-  
+
   $.post("../../Backend/logic/requestHandler.php", {
     action: "addPaymentMethod",
     type,
-    details
+    details,
+    password
   }, function (response) {
     if (response.success) {
       alert("Zahlungsmethode gespeichert.");
@@ -220,15 +188,17 @@ function speichereNeueZahlungsmethode() {
 
 
 // Zahlungsart bearbeiten
+let bearbeitePaymentId = null;
 function aendereZahlungsart(paymentId) {
-  let bearbeitePaymentId = paymentId;
-
+  const password = $("#zahlungForm input[name='password']").val();
+  bearbeitePaymentId = paymentId;
   $.post("../../Backend/logic/requestHandler.php", {
     action: "getPaymentMethod",
-    paymentId: paymentId
+    paymentId: paymentId,
+    password
   }, function (response) {
     if (response.success && response.data) {
-      const daten = response.data;
+      const daten = response.data[0];
       $("#aendereZahlungsartForm").show();
       $("#neueZahlungsartForm").hide(); // Neues Formular verstecken
 
@@ -243,8 +213,9 @@ function aendereZahlungsart(paymentId) {
 function speichereBearbeiteteZahlungsart() {
   const updatedType = $("#updated_payment_type").val();
   const updatedDetails = $("#updated_payment_details").val();
+  const password = $("#zahlungForm input[name='password']").val();
 
-  if (!updatedType || !updatedDetails || bearbeitePaymentId === null) {
+  if (!updatedType || !updatedDetails || bearbeitePaymentId === null ) {
     alert("Bitte Zahlungsart, Details und Passwort eingeben.");
     return;
   }
@@ -253,7 +224,8 @@ function speichereBearbeiteteZahlungsart() {
     action: "updatePaymentMethod",
     paymentId: bearbeitePaymentId,
     type: updatedType,
-    details: updatedDetails
+    details: updatedDetails,
+    password
   }, function (response) {
     if (response.success) {
       alert("Zahlungsart aktualisiert.");
@@ -269,10 +241,17 @@ function speichereBearbeiteteZahlungsart() {
 
 // Zahlungsart löschen
 function loescheZahlungsart(paymentId) {
+  const password = $("#zahlungForm input[name='password']").val();
   if (confirm("Bist du dir wirklich sicher? Dies kann nicht rückgängig gemacht werden")) {
+
+    if (!password) {
+      alert("Bitte Passwort eingeben.");
+      return;
+    }
     $.post("../../Backend/logic/requestHandler.php", {
       action: "deletePaymentMethod",
-      paymentId
+      paymentId,
+      password
     }, function (response) {
       if (response.success) {
         alert("Zahlungsmethode geslöscht.");

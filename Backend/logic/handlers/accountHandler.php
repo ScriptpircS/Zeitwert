@@ -122,20 +122,27 @@ elseif ($action === 'getPaymentMethod') {
     $id = $_POST['paymentId'];
 
     try {
-        $userResult = $userModel->getByEmailOrUsername($username);
+        $username = $_SESSION['username'];
+        $user = $userModel->getByEmailOrUsername($username);
+        $userId = $user[0]['id'];
+        $password = trim($_POST['password'] ?? '');
 
-        if (count($userResult) !== 1) {
+        if (count($user) !== 1) {
             throw new Exception("Benutzerdaten konnten nicht geladen werden.");
         }
 
-        $user = $userResult[0];
-        $userId = $user['id'];
+        if (!$password) {
+            throw new Exception("Bitte Passwort ausfüllen.");
+        } elseif (!$user || !password_verify($password, $user[0]['password_hash'])) {
+            $response['message'] = 'Falsches Passwort.';
+        } else {
+            $sql = "SELECT type, details FROM payment_methods WHERE user_id = ? AND id = ?";
+            $data = $db->select($sql, [$userId, $id]);
+    
+            $response['success'] = true;
+            $response['data'] = $data;
+        }
 
-        $sql = "SELECT type, details FROM payment_methods WHERE user_id = ? AND id = ?";
-        $data = $db->select($sql, [$userId, $id]);
-
-        $response['success'] = true;
-        $response['data'] = $data;
     } catch (Exception $e) {
         $response['message'] = $e->getMessage();
     }
@@ -147,26 +154,28 @@ elseif ($action === 'addPaymentMethod') {
 
     try {
         $username = $_SESSION['username'];
-        $userResult = $userModel->getByEmailOrUsername($username);
+        $user = $userModel->getByEmailOrUsername($username);
+        $userId = $user[0]['id'];
 
-        if (count($userResult) !== 1) {
+        if (count($user) !== 1) {
             throw new Exception("Benutzer nicht gefunden.");
         }
 
-        $user = $userResult[0];
-        $userId = $user['id'];
-
         $type = trim($_POST['type'] ?? '');
         $details = trim($_POST['details'] ?? '');
+        $password = trim($_POST['password'] ?? '');
 
-        if (!$type || !$details) {
+        if (!$type || !$details || !$password) {
             throw new Exception("Bitte alle Felder ausfüllen.");
+        } elseif (!$user || !password_verify($password, $user[0]['password_hash'])) {
+            $response['message'] = 'Falsches Passwort.';
+        } else {
+            $sql = "INSERT INTO payment_methods (user_id, type, details) VALUES (?, ?, ?)";
+            $db->execute($sql, [$userId, $type, $details]);
+
+            $response['success'] = true;
         }
 
-        $sql = "INSERT INTO payment_methods (user_id, type, details) VALUES (?, ?, ?)";
-        $db->execute($sql, [$userId, $type, $details]);
-
-        $response['success'] = true;
     } catch (Exception $e) {
         $response['success'] = false;
         $response['message'] = $e->getMessage();
@@ -177,22 +186,36 @@ elseif ($action === 'addPaymentMethod') {
 elseif ($action === 'updatePaymentMethod') {
     requireLogin();
 
-    $username = $_SESSION['username'];
-    $userResult = $userModel->getByEmailOrUsername($username);
+    try {
+        $username = $_SESSION['username'];
+        $user = $userModel->getByEmailOrUsername($username);
+        $userId = $user[0]['id'];
+    
+        if (count($user) !== 1) {
+            throw new Exception("Benutzer nicht gefunden.");
+        }
+        
+        $id = $_POST['paymentId'];
+        $type = trim($_POST['type'] ?? '');
+        $details = trim($_POST['details'] ?? '');
+        $password = trim($_POST['password'] ?? '');
 
-    if (count($userResult) !== 1) {
-        throw new Exception("Benutzer nicht gefunden.");
+        if (!$type || !$details || !$password) {
+            throw new Exception("Bitte alle Felder ausfüllen.");
+        } elseif (!$user || !password_verify($password, $user[0]['password_hash'])) {
+            $response['message'] = 'Falsches Passwort.';
+        } else {
+            $sql = "UPDATE payment_methods SET type = ?, details = ? WHERE id = ? AND user_id = ?";
+            $db->execute($sql, [$type, $details, $id, $userId]);
+
+            $response['success'] = true;
+        }
+
+    } catch (Exception $e) {
+        $response['success'] = false;
+        $response['message'] = $e->getMessage();
     }
 
-    $user = $userResult[0];
-    $userId = $user['id'];
-
-    $id = $_POST['paymentId'];
-    $type = $_POST['type'];
-    $details = $_POST['details'];
-
-    $sql = "UPDATE payment_methods SET type = ?, details = ? WHERE id = ? AND user_id = ?";
-    $db->execute($sql, [$type, $details, $id, $userId]);
 
 }
 
@@ -204,19 +227,22 @@ elseif ($action === 'deletePaymentMethod') {
 
     try {
         $username = $_SESSION['username'];
-        $userResult = $userModel->getByEmailOrUsername($username);
+        $user = $userModel->getByEmailOrUsername($username);
+        $userId = $user[0]['id'];
+        $password = trim($_POST['password'] ?? '');
 
-        if (count($userResult) !== 1) {
+        if (count($user) !== 1) {
             throw new Exception("Benutzer nicht gefunden.");
+        } elseif (!$user || !password_verify($password, $user[0]['password_hash'])) {
+            $response['message'] = 'Falsches Passwort.';
+        } else {
+            $sql = "DELETE FROM payment_methods WHERE id = ? AND user_id = ?";
+            $db->execute($sql, [$id, $userId]);
+    
+            $response['success'] = true;
         }
 
-        $user = $userResult[0];
-        $userId = $user['id'];
 
-        $sql = "DELETE FROM payment_methods WHERE id = ? AND user_id = ?";
-        $db->execute($sql, [$id, $userId]);
-
-        $response['success'] = true;
     } catch (Exception $e) {
         $response['success'] = false;
         $response['message'] = $e->getMessage();
