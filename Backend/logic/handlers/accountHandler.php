@@ -18,9 +18,6 @@ $db = dbaccess::getInstance();
 if ($action === 'getAccountData') {
     $user = $userModel->getByEmailOrUsername($username);
     if ($user) {
-        $zahlung = $user[0]['zahlungsinfo'];
-        $masked = $zahlung ? '**** **** **** ' . substr($zahlung, -4) : 'Keine Zahlungsinfo hinterlegt';
-
         $response = [
             'success' => true,
             'data' => [
@@ -29,8 +26,7 @@ if ($action === 'getAccountData') {
                 'nachname' => $user[0]['nachname'],
                 'adresse' => $user[0]['adresse'],
                 'plz' => $user[0]['plz'],
-                'ort' => $user[0]['ort'],
-                'zahlungsinfo' => $masked
+                'ort' => $user[0]['ort']
             ]
         ];
     } else {
@@ -96,20 +92,44 @@ elseif ($action === 'loadPaymentMethods') {
     requireLogin();
 
     try {
-        $userResult = $userModel->getByEmailOrUsername($username);
+        $user = $userModel->getByEmailOrUsername($username);
+        $userId = $user[0]['id'];
 
-        if (count($userResult) !== 1) {
+        if (count($user) !== 1) {
             throw new Exception("Benutzerdaten konnten nicht geladen werden.");
         }
 
-        $user = $userResult[0];
-        $userId = $user['id'];
-
         $sql = "SELECT id, type, details FROM payment_methods WHERE user_id = ?";
-        $data = $db->select($sql, [$userId]);
+        $rawdata = $db->select($sql, [$userId]);
 
+        // Daten maskieren
+        $maskedData = array_map(function ($entry) {
+            $type = $entry['type'];
+            $details = $entry['details'];
+
+            switch ($type) {
+                case 'Kreditkarte':
+                    $masked = $details ? '**** **** **** ' . substr($details, -4) : '****';
+                    break;
+                case 'PayPal':
+                    $masked = preg_replace('/^(.)(.*)(@.*)$/', '$1***$3', $details);
+                    break;
+                case 'Bankeinzug':
+                    $masked = preg_replace('/^(.{2})(.*)(.{4})$/', '$1' . str_repeat('*', max(strlen($details) - 6, 0)) . '$3', $details);
+                    break;
+                default:
+                    $masked = '***';
+            }
+
+            return [
+                'id' => $entry['id'],
+                'type' => $type,
+                'details' => $masked
+            ];
+        }, $rawdata);
+        
         $response['success'] = true;
-        $response['data'] = $data;
+        $response['data'] = $maskedData;
     } catch (Exception $e) {
         $response['message'] = $e->getMessage();
     }
@@ -138,7 +158,7 @@ elseif ($action === 'getPaymentMethod') {
         } else {
             $sql = "SELECT type, details FROM payment_methods WHERE user_id = ? AND id = ?";
             $data = $db->select($sql, [$userId, $id]);
-    
+
             $response['success'] = true;
             $response['data'] = $data;
         }
@@ -190,11 +210,11 @@ elseif ($action === 'updatePaymentMethod') {
         $username = $_SESSION['username'];
         $user = $userModel->getByEmailOrUsername($username);
         $userId = $user[0]['id'];
-    
+
         if (count($user) !== 1) {
             throw new Exception("Benutzer nicht gefunden.");
         }
-        
+
         $id = $_POST['paymentId'];
         $type = trim($_POST['type'] ?? '');
         $details = trim($_POST['details'] ?? '');
@@ -238,7 +258,7 @@ elseif ($action === 'deletePaymentMethod') {
         } else {
             $sql = "DELETE FROM payment_methods WHERE id = ? AND user_id = ?";
             $db->execute($sql, [$id, $userId]);
-    
+
             $response['success'] = true;
         }
 

@@ -30,7 +30,6 @@ function ladeBenutzerdaten() {
       $("#anzeigeAdresse").text(data.adresse || "-");
       $("#anzeigePLZ").text(data.plz || "-");
       $("#anzeigeOrt").text(data.ort || "-");
-      $("#anzeigeZahlung").text(data.zahlungsinfo || "-");
 
       // Formularfelder im Modal
       $("#adresseForm input[name='anrede']").val(data.anrede);
@@ -122,7 +121,12 @@ function ladeZahlungsarten() {
 
       if (data.length === 0) {
         $tableBody.append(`<tr><td colspan="2">Noch keine Zahlungsarten hinterlegt.</td></tr>`);
+        $("#anzeigeZahlung").text("Keine Zahlungsarten hinterlegt.");
       } else {
+        const zahl = data.length;
+        const text = zahl === 1 ? "1 Methode hinterlegt" : `${zahl} Methoden hinterlegt`;
+        $("#anzeigeZahlung").text(text);
+
         data.forEach(item => {
           const $row = $(`
             <tr>
@@ -215,7 +219,7 @@ function speichereBearbeiteteZahlungsart() {
   const updatedDetails = $("#updated_payment_details").val();
   const password = $("#zahlungForm input[name='password']").val();
 
-  if (!updatedType || !updatedDetails || bearbeitePaymentId === null ) {
+  if (!updatedType || !updatedDetails || bearbeitePaymentId === null) {
     alert("Bitte Zahlungsart, Details und Passwort eingeben.");
     return;
   }
