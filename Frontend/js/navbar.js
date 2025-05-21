@@ -22,7 +22,7 @@ function loadNavbar() {
       document.body.insertBefore(navbarContainer, document.body.firstChild);
 
       fixNavbarLinks(prefix);
-      checkAutoLogin().then(() => {
+      checkAutoLogin().then(() => { // Prüfung ob Cookie stayLoggedIn gesetzt wurde
         handleUserSession(prefix);
         initLogout(prefix);
       });
@@ -121,13 +121,13 @@ function getCookieValue(name) {
   return null;
 }
 
-// Automatischer Login über Cookie
-async function checkAutoLogin() {
+// Automatischer Login über Cookie "stayLoggedIn"
+async function checkAutoLogin() { // Methode async um await zu verwenden
   const savedUser = getCookieValue("stayLoggedIn");
   if (!savedUser) return;
 
   try {
-    const response = await $.ajax({
+    const response = await $.ajax({ // await, damit Funktion erst fertig ausgeführt wird, bevor oben der Logout Button gesetzt wird
       url: "http://localhost/Zeitwert/Backend/logic/requestHandler.php",
       type: "POST",
       data: {
