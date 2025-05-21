@@ -1,5 +1,6 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) session_start();
+if (session_status() === PHP_SESSION_NONE)
+    session_start();
 
 require_once(__DIR__ . '/../../config/dbaccess.php');
 require_once(__DIR__ . '/../../models/user.class.php');
@@ -21,13 +22,14 @@ if ($action === 'login') {
     } else {
         $result = $userModel->getByEmailOrUsername($loginCredentials);
 
-        if (count($result) === 1) {
+        if (count($result) === 1) { // wenn genau 1 User mit den Daten gefunden wurde
             if ($result[0]['is_active'] == 'inactive') {
                 $response['message'] = "Dein Account ist deaktiviert. Bitte kontaktiere den Support.";
             } elseif (password_verify($password, $result[0]['password_hash'])) {
                 $_SESSION["username"] = $result[0]['username'];
                 $_SESSION["role"] = $result[0]['role'];
 
+                // Cookie "stayLoggedIn" wird für 30 Tage gesetzt (60s * 60 * 24 = 86400)
                 if ($stayLoggedIn === "true" || $stayLoggedIn === true) {
                     setcookie("stayLoggedIn", $loginCredentials, [
                         'expires' => time() + (86400 * 30),
@@ -82,6 +84,7 @@ elseif ($action === 'autoLogin') {
             $_SESSION["username"] = $result[0]['username'];
             $_SESSION["role"] = $result[0]['role'];
 
+            // setzt Cookielebenszeit wieder auf 30 Tage
             setcookie("stayLoggedIn", $loginCredentials, [
                 'expires' => time() + (86400 * 30),
                 'path' => '/'

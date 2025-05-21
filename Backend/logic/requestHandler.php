@@ -39,7 +39,7 @@ switch ($action) {
     case 'listCustomers':
     case 'toggleCustomer':
     case 'getCustomerOrders':
-    case 'deleteOrderItem':    
+    case 'deleteOrderItem':
     case 'updateOrderItemQuantity':
         require './handlers/userHandler.php';
         break;
@@ -65,7 +65,6 @@ switch ($action) {
     case 'placeOrder':
     case 'loadOrders':
     case 'loadOrderItems':
-    case 'getPaymentMethods':
         require './handlers/orderHandler.php';
         break;
 

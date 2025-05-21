@@ -1,14 +1,17 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) session_start();
+if (session_status() === PHP_SESSION_NONE)
+    session_start();
 
-function requireLogin() {
+function requireLogin()
+{
     if (!isset($_SESSION['username'])) {
         echo json_encode(['success' => false, 'message' => 'Nicht eingeloggt']);
         exit;
     }
 }
 
-function requireAdmin() {
+function requireAdmin()
+{
     if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
         echo json_encode(['success' => false, 'message' => 'Adminrechte erforderlich']);
         exit;

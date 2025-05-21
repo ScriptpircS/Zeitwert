@@ -87,7 +87,7 @@ elseif ($action === 'changePassword') {
     }
 }
 
-// Zahlungsmethoden anzeigen
+// Zahlungsmethoden in Tabelle anzeigen im "Zahlung" Tab vom Modal in "Mein Konto"
 elseif ($action === 'loadPaymentMethods') {
     requireLogin();
 
@@ -127,7 +127,7 @@ elseif ($action === 'loadPaymentMethods') {
                 'details' => $masked
             ];
         }, $rawdata);
-        
+
         $response['success'] = true;
         $response['data'] = $maskedData;
     } catch (Exception $e) {
@@ -135,7 +135,7 @@ elseif ($action === 'loadPaymentMethods') {
     }
 }
 
-// Zahlungsmethode laden
+// Zahlungsmethode laden --> notwendig zum ausfüllen der Felder beim Bearbeiten der Zahlungsmethode (funktioniert nur mit Passwort)
 elseif ($action === 'getPaymentMethod') {
     requireLogin();
 
@@ -168,7 +168,7 @@ elseif ($action === 'getPaymentMethod') {
     }
 }
 
-// Neue Zahlungsmethode speichern
+// Neue Zahlungsmethode speichern (funktioniert nur mit Passwort)
 elseif ($action === 'addPaymentMethod') {
     requireLogin();
 
@@ -202,7 +202,7 @@ elseif ($action === 'addPaymentMethod') {
     }
 }
 
-// Zahlungsmethode bearbeiten
+// Zahlungsmethode bearbeiten (funktioniert nur mit Passwort)
 elseif ($action === 'updatePaymentMethod') {
     requireLogin();
 
@@ -239,7 +239,7 @@ elseif ($action === 'updatePaymentMethod') {
 
 }
 
-// Zahlungsart löschen
+// Zahlungsart löschen (funktioniert nur mit Passwort)
 elseif ($action === 'deletePaymentMethod') {
     requireLogin();
 

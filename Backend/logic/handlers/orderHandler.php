@@ -165,30 +165,5 @@ elseif ($action === 'loadOrderItems') {
     }
 }
 
-// ===== Zahlungsmöglichkeiten anzeigen (nur eingeloggt) =====
-elseif ($action === 'getPaymentMethods') {
-    requireLogin();
-
-    try {
-        $username = $_SESSION['username'];
-        $userResult = $userModel->getByEmailOrUsername($username);
-
-        if (count($userResult) !== 1) {
-            throw new Exception("Benutzerdaten konnten nicht geladen werden.");
-        }
-
-        $user = $userResult[0];
-        $userId = $user['id'];
-
-        $sql = "SELECT id, type, details FROM payment_methods WHERE user_id = ?";
-        $methods = $db->select($sql, [$userId]);
-
-        $response['success'] = true;
-        $response['methods'] = $methods;
-    } catch (Exception $e) {
-        $response['message'] = $e->getMessage();
-    }
-}
-
 echo json_encode($response);
 exit;

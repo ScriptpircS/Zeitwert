@@ -142,7 +142,7 @@ function zeigeUpdateMessage(message, success) {
     .css("color", success ? "green" : "red");
 }
 
-// Zahlungsarten ladem
+// Zahlungsarten laden für Table im Tab "Zahlung" in Modal
 function ladeZahlungsarten() {
   $.post(
     "../../Backend/logic/requestHandler.php",
@@ -165,14 +165,15 @@ function ladeZahlungsarten() {
             zahl === 1 ? "1 Methode hinterlegt" : `${zahl} Methoden hinterlegt`;
           $("#anzeigeZahlung").text(text);
 
-          data.forEach((item) => {
+          data.forEach((item) => { // "Bearbeiten", "Löschen" und "Neue Zahlungsart hinzufügen" bekommen zusätzlich den type button, damit 
+                                   // diese nicht den alert auslösen beim ein- & ausblenden der jeweiligen Formulare
             const $row = $(`
             <tr>
               <td>${item.type}</td>
               <td>${item.details}</td>
               <td>
-                <button class="btn btn-outline-primary btn-sm me-2" onclick="aendereZahlungsart(${item.id})">Bearbeiten</button>
-                <button class="btn btn-outline-danger btn-sm" onclick="loescheZahlungsart(${item.id})">Löschen</button>
+                <button type="button" class="btn btn-outline-primary btn-sm me-2" onclick="ladeAendereZahlungsartForm(${item.id})"">Bearbeiten</button>
+                <button type="button" class="btn btn-outline-danger btn-sm" onclick="loescheZahlungsart(${item.id})">Löschen</button>
               </td>
             </tr>
           `);
@@ -181,7 +182,9 @@ function ladeZahlungsarten() {
         }
 
         const $addButton = $(`
+
         <button class="btn btn-zeitwert" onclick="zeigeNeueZahlungsartForm()">Neue Zahlungsart hinzufügen</button>
+
       `);
         $addContainer.append($addButton);
       } else {
@@ -194,7 +197,7 @@ function ladeZahlungsarten() {
   );
 }
 
-// Neue Zahlungsart anzeigen
+// Blendet Formular ein zum Hinzufügen einer neuen Zahlungsform. Aufgerufen über Button der in Ladezahlungsarten eingefügt wird
 function zeigeNeueZahlungsartForm() {
   $("#neueZahlungsartForm").toggle();
 }
@@ -239,11 +242,11 @@ function speichereNeueZahlungsmethode() {
   );
 }
 
-// Zahlungsart bearbeiten (vorladen)
-let bearbeitePaymentId = null;
-function aendereZahlungsart(paymentId) {
+// Zahlungsart bearbeiten (vorladen des Formulars, speichern in anderer Methode)
+let bearbeitePaymentId = null; // Variable global erstellt, damit die paymentId zwischen den Methoden weitergegeben wird 
+function ladeAendereZahlungsartForm(paymentId) { // 
   const password = $("#zahlungForm input[name='password']").val();
-  bearbeitePaymentId = paymentId;
+  bearbeitePaymentId = paymentId; // Variable geändert
 
   $.post(
     "../../Backend/logic/requestHandler.php",
@@ -253,12 +256,12 @@ function aendereZahlungsart(paymentId) {
       password,
     },
     function (response) {
-      if (response.success && response.data) {
+      if (response.success && response.data) { // Formulare fürs Hinzufügen / Bearbeiten werden umgeschalten
         const daten = response.data[0];
         $("#aendereZahlungsartForm").show();
         $("#neueZahlungsartForm").hide();
 
-        $("#updated_payment_type").val(daten.type);
+        $("#updated_payment_type").val(daten.type); // Füllt Daten aus Response in Felder
         $("#updated_payment_details").val(daten.details);
       } else {
         zeigeUpdateMessage(
@@ -271,7 +274,7 @@ function aendereZahlungsart(paymentId) {
   );
 }
 
-// Bearbeitete Zahlungsart speichern
+// Bearbeitete Zahlungsart speichern mit Feldern aus Zahlungsformular
 function speichereBearbeiteteZahlungsart() {
   const updatedType = $("#updated_payment_type").val();
   const updatedDetails = $("#updated_payment_details").val();
@@ -289,7 +292,7 @@ function speichereBearbeiteteZahlungsart() {
     "../../Backend/logic/requestHandler.php",
     {
       action: "updatePaymentMethod",
-      paymentId: bearbeitePaymentId,
+      paymentId: bearbeitePaymentId, // PaymentId aus globaler Variable übernommen zur Weitergabe
       type: updatedType,
       details: updatedDetails,
       password,
@@ -301,6 +304,7 @@ function speichereBearbeiteteZahlungsart() {
           : "Fehler: " + response.message,
         response.success
       );
+      bearbeitePaymentId = null; // PaymentId als globale Variable wieder auf null gesetzt
       if (response.success) {
         $("#aendereZahlungsartForm").hide();
         bearbeitePaymentId = null;

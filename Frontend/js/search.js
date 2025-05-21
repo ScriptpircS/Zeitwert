@@ -9,7 +9,7 @@ function initLiveSearch() {
 function applySearchFilter() {
   const input = $("#searchFilter").val().trim();
 
-  if (input.length === 0) {
+  if (input.length === 0) { // wenn searchFilter leer ist, sollen Produkte normal geladen werden über products.js
     fetchProducts();
     return;
   }

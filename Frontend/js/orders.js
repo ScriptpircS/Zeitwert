@@ -1,3 +1,4 @@
+// Lädt Tabelle für Bestellungen anhand des Users für orderHistory.html
 function loadOrders() {
   $.ajax({
     url: "http://localhost/Zeitwert/Backend/logic/requestHandler.php",
@@ -19,7 +20,7 @@ function loadOrders() {
           return;
         }
 
-        $.each(order, function (orderId, item) {
+        $.each(order, function (orderId, item) { // laden der einzelnen Zeilen
           const $tableRow = $(`
               <tr>
                 <th scope="row">${item.orderId}</th>
@@ -46,6 +47,7 @@ function loadOrders() {
   });
 }
 
+// Bestellitems werden über Modal angezeigt, welches über Button aufgerufen wird
 function loadOrderItems(orderId) {
   $.ajax({
     url: "http://localhost/Zeitwert/Backend/logic/requestHandler.php",
