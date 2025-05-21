@@ -56,6 +56,7 @@ function ladeCheckoutWarenkorb() {
   );
 }
 
+// füllt Daten ein in das Bestellformular
 function ladeNutzerdaten() {
   $.post(
     "../../Backend/logic/requestHandler.php",
@@ -75,26 +76,27 @@ function ladeNutzerdaten() {
   );
 }
 
+// für <select> Element mit den hinterlegten Zahlungsarten
 function ladeZahlungsarten() {
   $.post(
     "../../Backend/logic/requestHandler.php",
-    { action: "getPaymentMethods" },
+    { action: "loadPaymentMethods" },
     function (response) {
       const $container = $("#payment_methods").empty();
       $container.append('<h2 class="h5">Zahlungsinformationen:</h2>');
 
       if (
         response.success &&
-        Array.isArray(response.methods) &&
-        response.methods.length > 0
+        Array.isArray(response.data) &&
+        response.data.length > 0
       ) {
         const $select = $(
           '<select class="form-select" name="payment_method" id="payment_method" required></select>'
         );
         $select.append('<option value="">Zahlungsmethode wählen</option>');
 
-        response.methods.forEach((method) => {
-          const option = `<option value="${method.id}">${method.type}</option>`;
+        response.data.forEach((method) => {
+          const option = `<option value="${method.id}">${method.type} - ${method.details}</option>`;
           $select.append(option);
         });
 
@@ -173,6 +175,7 @@ $(document).on("click", "#applyCouponBtn", function () {
   );
 });
 
+// Bestellung aufeben
 $("#checkoutForm").on("submit", function (e) {
   e.preventDefault();
   if (!validateCheckoutForm()) return;

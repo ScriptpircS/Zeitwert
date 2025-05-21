@@ -65,7 +65,6 @@ switch ($action) {
     case 'placeOrder':
     case 'loadOrders':
     case 'loadOrderItems':
-    case 'getPaymentMethods':
         require './handlers/orderHandler.php';
         break;
 
