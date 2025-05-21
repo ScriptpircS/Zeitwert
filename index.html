@@ -23,24 +23,31 @@
   <!-- Navbar wird per JS geladen -->
 
   <main class="flex-grow-1">
-    <div class="container mt-3 text-center">
-      <h1>Willkommen bei Zeitwert</h1>
-      <label for="categorySelect">Kategorie wählen:</label>
-      <select id="categorySelect" class="form-select w-auto mx-auto">
-        <option value="">Alle Produkte</option>
-        <option value="2">Taucheruhren</option>
-        <option value="1">Chronographen</option>
-        <option value="3">Klassiker</option>
-      </select>
-    </div>
-
-    <div class="container mt-3 text-center">
-      <label for="searchFilter">Suche einschränken</label>
-      <input type="text" id="searchFilter" placeholder="Suchbegriff eingeben">
+    <div class="container mt-4">
+      <div class="row g-3 align-items-center justify-content-center">
+        <h4>...mehr als Armbanduhren, tauchen Sie ein in die Welt von luxeriösen Zeitmessern</h4>
+        <div class="col-auto">
+          <label for="categorySelect" class="col-form-label">Kategorie auswählen:</label>
+        </div>
+        <div class="col-auto">
+          <select id="categorySelect" class="form-select">
+            <option value="">Alle Produkte</option>
+            <option value="2">Taucheruhren</option>
+            <option value="1">Chronographen</option>
+            <option value="3">Klassiker</option>
+          </select>
+        </div>
+        <div class="col-auto">
+          <label for="searchFilter" class="col-form-label">Suche:</label>
+        </div>
+        <div class="col-auto">
+          <input type="text" id="searchFilter" class="form-control" placeholder="Suchbegriff eingeben">
+        </div>
+      </div>
     </div>
 
     <div class="container text-center mt-5">
-      <div class="row justify-content-center align-items-stretch" id="productContainer">
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 justify-content-center" id="productContainer">
         <!-- Produkte werden hier geladen -->
       </div>
     </div>

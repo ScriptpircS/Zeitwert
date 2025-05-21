@@ -57,12 +57,12 @@ function renderProducts(products) {
           <h3>${product.marke} – ${product.modell}</h3>
           <p><strong>€ ${parseFloat(product.preis || 0).toFixed(2)}</strong></p>
           <p class="stars">${stars}</p>
-          <button class="btn btn-primary add-to-cart-btn" data-id="${
+          <button class="btn btn-warenkorb add-to-cart-btn" data-id="${
             product.id
           }">
             In den Warenkorb
           </button>
-          <button class="btn btn-secondary mt-2 show-details-btn" data-id="${
+          <button class="btn btn-details mt-2 show-details-btn" data-id="${
             product.id
           }">
             Details

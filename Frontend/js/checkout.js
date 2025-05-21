@@ -16,7 +16,7 @@ function checkLoginStatusAndLoadCheckout() {
             🔐 Du bist nicht eingeloggt.<br>Bitte melde dich an, um deine Bestellung abzuschließen.
           </div>
           <div class="text-center mt-4">
-            <a href="login.html" class="btn btn-primary">Jetzt einloggen</a>
+            <a href="login.html" class="btn btn-zeitwert">Jetzt einloggen</a>
           </div>
         `);
       }
@@ -101,7 +101,7 @@ function ladeZahlungsarten() {
         $container.append($select);
       } else {
         $container.append(
-          '<p>Keine Zahlungsarten hinterlegt. Bitte lege eine Zahlungsart im Profil an!</p><br><a href="account.html" class="btn btn-primary">Zum Account</a>'
+          '<p>Keine Zahlungsarten hinterlegt. Bitte lege eine Zahlungsart im Profil an!</p><br><a href="account.html" class="btn btn-zeitwert">Zum Account</a>'
         );
       }
     },

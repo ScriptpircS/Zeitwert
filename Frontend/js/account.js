@@ -181,7 +181,7 @@ function ladeZahlungsarten() {
         }
 
         const $addButton = $(`
-        <button class="btn btn-success" onclick="zeigeNeueZahlungsartForm()">Neue Zahlungsart hinzufügen</button>
+        <button class="btn btn-zeitwert" onclick="zeigeNeueZahlungsartForm()">Neue Zahlungsart hinzufügen</button>
       `);
         $addContainer.append($addButton);
       } else {
