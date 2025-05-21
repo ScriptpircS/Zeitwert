@@ -35,7 +35,7 @@ function ladeWarenkorb() {
         const preis = parseFloat(produkt.preis || 0) * menge;
         gesamtpreis += preis;
 
-      const $card = $(`
+        const $card = $(`
         <div class="col-sm-6 col-md-4 col-lg-3 d-flex justify-content-center">
           <div class="product-card warenkorb-card text-center" draggable="true" data-id="${productId}">
             <div class="warenkorb-image-wrapper mx-auto mb-2">

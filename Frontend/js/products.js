@@ -51,20 +51,17 @@ function renderProducts(products) {
     const $card = $(`
       <div class="col-sm-6 col-md-4 col-lg-3">
         <div class="product-card" draggable="true" data-id="${product.id}">
-          <img src="/Zeitwert/Backend/productpictures/${
-            product.bild_url
-          }" alt="${product.modell}">
+          <img src="/Zeitwert/Backend/productpictures/${product.bild_url
+      }" alt="${product.modell}">
           <h3>${product.marke} – ${product.modell}</h3>
           <p><strong>€ ${parseFloat(product.preis || 0).toFixed(2)}</strong></p>
           <p class="stars">${stars}</p>
-          <button class="btn btn-warenkorb add-to-cart-btn" data-id="${
-            product.id
-          }">
+          <button class="btn btn-warenkorb add-to-cart-btn" data-id="${product.id
+      }">
             In den Warenkorb
           </button>
-          <button class="btn btn-details mt-2 show-details-btn" data-id="${
-            product.id
-          }">
+          <button class="btn btn-details mt-2 show-details-btn" data-id="${product.id
+      }">
             Details
           </button>
         </div>
@@ -117,8 +114,7 @@ function zeigeProduktDetails(id) {
           <h2>${p.marke || ""} – ${p.modell || "Produkt"}</h2>
 
           <p>${p.beschreibung || ""}</p>
-          <p class="text-muted">Entdecken Sie weitere Modelle der Marke ${
-            p.marke
+          <p class="text-muted">Entdecken Sie weitere Modelle der Marke ${p.marke
           } in unserem OnlineStore.</p>
 
           <table class="table table-sm table-borderless">

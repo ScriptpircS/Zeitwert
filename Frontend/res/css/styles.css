@@ -5,19 +5,19 @@
   border-radius: 10px;
   padding: 15px;
   text-align: center;
-  box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
   background-color: white;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
-  
+
 .product-card img {
   width: 100%;
   height: 200px;
   object-fit: contain;
   object-position: center;
-  background-color: #f9f9f9; /* Optionaler neutraler Hintergrund */
+  background-color: #f9f9f9;
   border-radius: 8px;
 }
 
@@ -39,7 +39,6 @@
   background-color: #f4e9dc !important;
 }
 
-/* Schriftart für Navbar */
 .navbar,
 .navbar a,
 .navbar .nav-link,
@@ -95,14 +94,14 @@ form {
   background-color: white;
   border: 1px solid #ccc;
   border-radius: 10px;
-  box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
 .btn-warenkorb {
-  background-color: #f4e9dc; 
+  background-color: #f4e9dc;
   color: #333;
   border: 1px solid #f4e9dc;
 }
@@ -113,7 +112,7 @@ form {
 }
 
 .btn-details {
-  background-color: #a67c52; 
+  background-color: #a67c52;
   color: #fff;
   border: 1px solid #a67c52;
 }
@@ -135,7 +134,7 @@ form {
 }
 
 .btn-zeitwertsec {
-  background-color: #a67c52; 
+  background-color: #a67c52;
   color: #fff;
   border: 1px solid #a67c52;
 }
