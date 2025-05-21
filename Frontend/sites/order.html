@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Bestellen</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="../res/css/styles.css" />
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    window.accessRules = { requireLogin: false, requireAdmin: false };
+  </script>
+  <script defer src="../js/navbar.js"></script>
+  <script defer src="../js/cart.js"></script>
+  <script defer src="../js/checkout.js"></script>
+  <script defer src="../js/main.js"></script>
+  <script defer src="../js/footer.js"></script>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+  <main class="container py-5 flex-grow-1" style="max-width: 600px">
+    <div id="checkoutBody">
+      <form id="checkoutForm" method="POST">
+        <h1 class="h3 mb-4 fw-normal text-center">Checkout</h1>
+        <!-- Produkte -->
+        <div class="mb-4">
+          <h2 class="h5">Ihre Produkte</h2>
+          <ul id="checkoutCartSummary" class="list-group mb-2">
+            <!-- Produktliste <li> -->
+          </ul>
+          <div id="checkoutPrice" class="fw-bold">Gesamt:</div>
+        </div>
+
+        <!-- Lieferdaten -->
+        <div class="mb-4">
+          <h2 class="h5">Lieferdaten</h2>
+          <div class="mb-2">
+            <label class="form-label">Anrede</label>
+            <select class="form-select">
+              <option value="Herr">Herr</option>
+              <option value="Frau">Frau</option>
+              <option value="Divers">Divers</option>
+            </select>
+          </div>
+
+          <div class="form-floating mb-2">
+            <input type="text" id="firstname" name="firstname" class="form-control" placeholder="Vorname" required />
+            <label for="firstname">Vorname</label>
+          </div>
+
+          <div class="form-floating mb-2">
+            <input type="text" id="lastname" name="lastname" class="form-control" placeholder="Nachname" required />
+            <label for="lastname">Nachname</label>
+          </div>
+
+          <div class="form-floating mb-2">
+            <input type="text" id="street" name="street" class="form-control" placeholder="Straße" required />
+            <label for="street">Straße</label>
+          </div>
+
+          <div class="form-floating mb-2">
+            <input type="text" id="plz" name="plz" class="form-control" placeholder="PLZ" required />
+            <label for="plz">Postleitzahl</label>
+          </div>
+
+          <div class="form-floating mb-2">
+            <input type="text" id="ort" name="ort" class="form-control" placeholder="Ort" required />
+            <label for="ort">Ort</label>
+          </div>
+
+          <div class="mb-2">
+            <label for="country" class="form-label">Land</label>
+            <select id="country" class="form-select">
+              <option value="Austria" selected>Österreich</option>
+              <option value="Germany">Deutschland</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Zahlung -->
+        <div class="mb-4" id="payment_methods">
+          <!-- Wird über checkout.js eingefügt -->
+          <h2 class="h5">Zahlungsinformationen</h2>
+        </div>
+
+        <!-- Rechnungsadresse -->
+        <div id="paymentadress" hidden>
+          <h2 class="h5">Rechnungsadresse</h2>
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" checked />
+            <label class="form-check-label">Gleich wie Lieferadresse</label>
+          </div>
+        </div>
+
+        <!-- Gutschein -->
+        <div id="couponSection" class="my-4">
+          <h2 class="h5">Gutscheincode einlösen</h2>
+          <div class="input-group">
+            <input type="text" id="couponCode" class="form-control" placeholder="Gutscheincode eingeben" />
+            <button type="button" class="btn btn-zeitwert" id="applyCouponBtn">
+              Einlösen
+            </button>
+          </div>
+          <div id="couponMessage" class="text-danger mt-1"></div>
+        </div>
+
+        <button class="btn btn-zeitwert w-100 mt-3" type="submit" id="checkoutSubmit">
+          Bestellung abschließen
+        </button>
+      </form>
+    </div>
+  </main>
+</body>
+
+</html>

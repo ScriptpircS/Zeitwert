@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Userverwaltung</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="/Zeitwert/Frontend/res/css/styles.css" />
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script>
+    window.accessRules = { requireLogin: true, requireAdmin: true };
+  </script>
+  <script src="../../js/navbar.js" defer></script>
+  <script src="../../js/admin.js" defer></script>
+  <script src="../../js/main.js" defer></script>
+  <script src="../../js/footer.js" defer></script>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+  <main class="flex-grow-1">
+    <div class="container mt-4">
+      <h1 class="text-center mb-4">Admin-Kundenverwaltung</h1>
+      <div class="d-flex justify-content-center gap-2 mb-4 mt-4" id="customerContainer"></div>
+      <div id="orderContainer" class="mt-5"></div>
+    </div>
+  </main>
+</body>
+
+</html>

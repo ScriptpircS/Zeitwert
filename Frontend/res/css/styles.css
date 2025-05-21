@@ -1,0 +1,150 @@
+.product-card {
+  width: 100%;
+  height: 100%;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 15px;
+  text-align: center;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.product-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: contain;
+  object-position: center;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+
+.product-card h3 {
+  margin: 10px 0 5px;
+  font-size: 18px;
+}
+
+.product-card p {
+  margin: 0;
+}
+
+.stars {
+  color: gold;
+}
+
+.bg-light {
+  --bs-bg-opacity: 1;
+  background-color: #f4e9dc !important;
+}
+
+.navbar,
+.navbar a,
+.navbar .nav-link,
+.navbar-brand,
+.navbar-brand ms-2 {
+  font-family: "Montserrat", sans-serif, #3b2a1c;
+}
+
+body {
+  background-color: #faf3ec;
+}
+
+form {
+  background-color: #f8f9fa;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+}
+
+.custom-footer {
+  background-color: #3b2a1c;
+}
+
+.custom-footer a {
+  color: #f4e9dc;
+}
+
+.custom-footer a:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+.warenkorb-card img {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 8px;
+}
+
+.warenkorb-image-wrapper {
+  width: 150px;
+  height: 150px;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.warenkorb-card {
+  width: 100%;
+  height: 100%;
+  padding: 15px;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.btn-warenkorb {
+  background-color: #f4e9dc;
+  color: #333;
+  border: 1px solid #f4e9dc;
+}
+
+.btn-warenkorb:hover {
+  background-color: #ccc;
+  color: #000;
+}
+
+.btn-details {
+  background-color: #a67c52;
+  color: #fff;
+  border: 1px solid #a67c52;
+}
+
+.btn-details:hover {
+  background-color: #8b5e3c;
+  color: #fff;
+}
+
+.btn-zeitwert {
+  background-color: #f4e9dc;
+  color: #000;
+  border: 1px solid #f4e9dc;
+}
+
+.btn-zeitwert:hover {
+  background-color: #ccc;
+  color: #000;
+}
+
+.btn-zeitwertsec {
+  background-color: #a67c52;
+  color: #fff;
+  border: 1px solid #a67c52;
+}
+
+.btn-zeitwertsec:hover {
+  background-color: #8b5e3c;
+  color: #fff;
+}
+
+.badge-custom {
+  background-color: #a67c52;
+  color: #fff;
+}
