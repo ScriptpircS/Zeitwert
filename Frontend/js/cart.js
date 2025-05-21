@@ -124,7 +124,7 @@ function initDragAndDrop() {
     e.originalEvent.dataTransfer.setData("productId", productId);
   });
 
-  // Ziel-Dropzone in der Navbar
+  // Ziel-Dropzone in der Navbar (ICON)
   const dropZone = document.getElementById("dropzone-warenkorb");
   if (!dropZone) return;
 
@@ -144,6 +144,7 @@ function initDragAndDrop() {
     const productId = event.dataTransfer.getData("productId");
     if (!productId) return;
 
+    // AJAX-Anfrage, um das Produkt zum Warenkorb hinzuzufügen
     $.ajax({
       url: "http://localhost/Zeitwert/Backend/logic/requestHandler.php",
       type: "POST",

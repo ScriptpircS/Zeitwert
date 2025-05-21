@@ -205,6 +205,7 @@ function renderAdminProducts(products) {
   }
   
   // ========== GUTSCHEINE ADMIN - CREATE ==========
+  // Gutscheinformular anzeigen
   function showCreateCouponForm() {
     $('#contentArea').html(`
       <div class="col-12 d-flex justify-content-center">
@@ -223,7 +224,7 @@ function renderAdminProducts(products) {
       </div>
     `);
     
-  
+  // Gutscheinformular per AJAX absenden
     $('#createCouponForm').submit(function (e) {
       e.preventDefault();
       const formData = $(this).serialize();
@@ -244,6 +245,7 @@ function renderAdminProducts(products) {
   }
   
   // ========== GUTSCHEINE ADMIN - READ ==========
+  // Gutscheine laden
   function fetchAdminCoupons() {
     $.ajax({
       url: 'http://localhost/Zeitwert/Backend/logic/requestHandler.php',
@@ -260,7 +262,8 @@ function renderAdminProducts(products) {
       }
     });
   }
-  
+
+  // Gutscheine anzeigen
   function renderAdminCoupons(coupons) {
     const $container = $("#contentArea");
     if ($container.length === 0) return;
