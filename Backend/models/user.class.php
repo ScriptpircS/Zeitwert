@@ -143,18 +143,23 @@ public function deleteOrderItem($orderItemId) {
 
     $sql = "DELETE FROM order_items WHERE id = :id";
     return $this->db->execute($sql, [':id' => $orderItemId]);
+
+    // Gesamtpreis neu berechnen
+    $this->recalculateOrderTotalByItemId($orderitemId);
+
+    return true;
 }
 
 // === Orderitem aktualisieren (ADMIN)
-public function updateOrderItemQuantity($itemId, $qty) {
-    if (!$itemId || !$qty || !is_numeric($qty) || $qty < 1) {
+public function updateOrderItemQuantity($orderItemId, $qty) {
+    if (!$orderItemId || !$qty || !is_numeric($qty) || $qty < 1) {
         return false;
     }
 
     // Menge aktualisieren
     $updateSuccess = $this->db->execute(
         "UPDATE order_items SET menge = :qty WHERE id = :id",
-        [':qty' => $qty, ':id' => $itemId]
+        [':qty' => $qty, ':id' => $orderItemId]
     );
 
     if (!$updateSuccess) {
@@ -162,7 +167,7 @@ public function updateOrderItemQuantity($itemId, $qty) {
     }
 
     // Gesamtpreis neu berechnen
-    $this->recalculateOrderTotalByItemId($itemId);
+    $this->recalculateOrderTotalByItemId($orderItemId);
 
     return true;
 }

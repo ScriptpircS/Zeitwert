@@ -26,7 +26,6 @@ if ($action === 'getUserData') {
             'adresse' => $userData[0]['adresse'],
             'plz' => $userData[0]['plz'],
             'ort' => $userData[0]['ort'],
-            'zahlungsinfo' => $userData[0]['zahlungsinfo'],
         ];
     } else {
         $response['message'] = "Benutzerdaten konnten nicht gefunden werden.";
@@ -53,7 +52,7 @@ elseif ($action === 'toggleCustomer') {
         $newStatus = $userModel->toggleCustomerStatus($userId);
         if ($newStatus !== null) {
             $response['success'] = true;
-            $response['message'] = $newStatus ? "Kunde aktiviert." : "Kunde deaktiviert.";
+            $response['message'] = ($newStatus === 'active') ? "Kunde aktiviert." : "Kunde deaktiviert.";
         } else {
             $response['message'] = "Kunde nicht gefunden.";
         }
@@ -61,6 +60,7 @@ elseif ($action === 'toggleCustomer') {
         $response['message'] = "Kunden-ID fehlt.";
     }
 }
+
 
 // ===== getCustomerOrders (Admin) =====
 elseif ($action === 'getCustomerOrders') {
