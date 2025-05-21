@@ -19,7 +19,7 @@ function ladeWarenkorb() {
       if (!cart || Object.keys(cart).length === 0) {
         $container.html("<p>🛒 Dein Warenkorb ist leer.</p>");
         $cocontainer.html(
-          '<a href="../../index.html" class="btn btn-success mt-4" id="toIndex">Zu den Uhren</a>'
+          '<a href="../../index.html" class="btn btn-zeitwertsec mt-4" id="toIndex">Zu den Uhren</a>'
         );
         $("#cart-count").text("0");
         return;
@@ -36,22 +36,26 @@ function ladeWarenkorb() {
         gesamtpreis += preis;
 
         const $card = $(`
-          <div class="col-sm-6 col-md-4 col-lg-3">
-            <div class="product-card warenkorb-card" draggable="true" data-id="${productId}">
-              <img src="/Zeitwert/Backend/productpictures/${
-                produkt.bild_url || "fallback.jpg"
-              }" alt="${produkt.modell || "Produkt"}" style="max-width:150px;">
-              <h3>${produkt.marke || "Unbekannt"} – ${produkt.modell || ""}</h3>
-              <p>Einzelpreis: € ${parseFloat(produkt.preis).toFixed(2)}</p>
-              <p>Gesamt: <strong>€ ${preis.toFixed(2)}</strong></p>
-              <div class="menge-steuerung">
-                <label>Menge:</label>
-                <input type="number" min="1" value="${menge}" onchange="aktualisiereMenge('${productId}', this.value)">
-              </div>
-              <button class="btn btn-danger btn-sm mt-2" onclick="entferneProdukt('${productId}')">🗑️ Entfernen</button>
+        <div class="col-sm-6 col-md-4 col-lg-3 d-flex justify-content-center">
+          <div class="product-card warenkorb-card text-center" draggable="true" data-id="${productId}">
+            <div class="warenkorb-image-wrapper mx-auto mb-2">
+              <img src="/Zeitwert/Backend/productpictures/${produkt.bild_url || "fallback.jpg"}"
+                  alt="${produkt.modell || "Produkt"}">
             </div>
+            <h3>${produkt.marke || "Unbekannt"} – ${produkt.modell || ""}</h3>
+            <p>Einzelpreis: € ${parseFloat(produkt.preis).toFixed(2)}</p>
+            <p>Gesamt: <strong>€ ${preis.toFixed(2)}</strong></p>
+            <div class="menge-steuerung d-flex justify-content-center align-items-center gap-2">
+              <label for="menge-${productId}" class="form-label mb-0">Menge:</label>
+              <input id="menge-${productId}" type="number" min="1" value="${menge}" class="form-control w-auto"
+                    onchange="aktualisiereMenge('${productId}', this.value)">
+            </div>
+            <button class="btn btn-danger btn-sm mt-2" onclick="entferneProdukt('${productId}')">
+            Entfernen
+            </button>
           </div>
-        `);
+        </div>
+      `);
 
         $container.append($card);
       });
@@ -63,7 +67,7 @@ function ladeWarenkorb() {
       );
 
       $cocontainer.html(
-        '<a href="order.html" class="btn btn-success mt-4" id="toCheckout">Zur Kasse</a>'
+        '<a href="order.html" class="btn btn-zeitwertsec mt-4" id="toCheckout">Zur Kasse</a>'
       );
       $("#cart-count").text(response.gesamtmenge);
     },

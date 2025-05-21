@@ -90,12 +90,10 @@ function renderAdminProducts(products) {
         <td>${product.modell}</td>
         <td>€ ${parseFloat(product.preis || 0).toFixed(2)}</td>
         <td>
-          <button class="btn btn-warning btn-sm me-1" onclick="editProduct(${
-            product.id
-          })">Bearbeiten</button>
-          <button class="btn btn-danger btn-sm" onclick="deleteProduct(${
-            product.id
-          })">Löschen</button>
+          <button class="btn btn-warning btn-sm me-1" onclick="editProduct(${product.id
+      })">Bearbeiten</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteProduct(${product.id
+      })">Löschen</button>
         </td>
       </tr>
     `;
@@ -123,50 +121,36 @@ function editProduct(id) {
               <h3>Produkt bearbeiten</h3>
               <form id="updateForm" enctype="multipart/form-data">
                   <input type="hidden" name="id" value="${product.id}">
-                  <input class="form-control mb-2" type="text" name="marke" value="${
-                    product.marke
-                  }" required>
-                  <input class="form-control mb-2" type="text" name="modell" value="${
-                    product.modell
-                  }" required>
-                  <textarea class="form-control mb-2" name="beschreibung" rows="3">${
-                    product.beschreibung
-                  }</textarea>
-                  <input class="form-control mb-2" type="text" name="referenz" value="${
-                    product.referenz || ""
-                  }" placeholder="Referenz">
-                  <input class="form-control mb-2" type="text" name="lunette" value="${
-                    product.lunette || ""
-                  }" placeholder="Lünette">
-                  <input class="form-control mb-2" type="text" name="gehaeuse" value="${
-                    product.gehaeuse || ""
-                  }" placeholder="Gehäuse">
-                  <input class="form-control mb-2" type="text" name="uhrwerk" value="${
-                    product.uhrwerk || ""
-                  }" placeholder="Uhrwerk">
-                  <input class="form-control mb-2" type="text" name="armband" value="${
-                    product.armband || ""
-                  }" placeholder="Armband">
-                  <input class="form-control mb-2" type="text" name="schliesse" value="${
-                    product.schliesse || ""
-                  }" placeholder="Schließe">
-                  <textarea class="form-control mb-2" name="merkmale" rows="2" placeholder="Merkmale">${
-                    product.merkmale || ""
-                  }</textarea>
-                  <input class="form-control mb-2" type="text" name="wasserdicht" value="${
-                    product.wasserdicht || ""
-                  }" placeholder="Wasserdicht">
-                  <input class="form-control mb-2" type="number" name="preis" value="${
-                    product.preis
-                  }" step="0.01" required>
+                  <input class="form-control mb-2" type="text" name="marke" value="${product.marke
+          }" required>
+                  <input class="form-control mb-2" type="text" name="modell" value="${product.modell
+          }" required>
+                  <textarea class="form-control mb-2" name="beschreibung" rows="3">${product.beschreibung
+          }</textarea>
+                  <input class="form-control mb-2" type="text" name="referenz" value="${product.referenz || ""
+          }" placeholder="Referenz">
+                  <input class="form-control mb-2" type="text" name="lunette" value="${product.lunette || ""
+          }" placeholder="Lünette">
+                  <input class="form-control mb-2" type="text" name="gehaeuse" value="${product.gehaeuse || ""
+          }" placeholder="Gehäuse">
+                  <input class="form-control mb-2" type="text" name="uhrwerk" value="${product.uhrwerk || ""
+          }" placeholder="Uhrwerk">
+                  <input class="form-control mb-2" type="text" name="armband" value="${product.armband || ""
+          }" placeholder="Armband">
+                  <input class="form-control mb-2" type="text" name="schliesse" value="${product.schliesse || ""
+          }" placeholder="Schließe">
+                  <textarea class="form-control mb-2" name="merkmale" rows="2" placeholder="Merkmale">${product.merkmale || ""
+          }</textarea>
+                  <input class="form-control mb-2" type="text" name="wasserdicht" value="${product.wasserdicht || ""
+          }" placeholder="Wasserdicht">
+                  <input class="form-control mb-2" type="number" name="preis" value="${product.preis
+          }" step="0.01" required>
   
                   <div class="mb-3">
-                      <img src="/Zeitwert/Backend/productpictures/${
-                        product.bild_url
-                      }" style="max-width:150px;">
-                      <button type="button" class="btn btn-danger btn-sm" onclick="deleteImage(${
-                        product.id
-                      })">Bild löschen</button>
+                      <img src="/Zeitwert/Backend/productpictures/${product.bild_url
+          }" style="max-width:150px;">
+                      <button type="button" class="btn btn-danger btn-sm" onclick="deleteImage(${product.id
+          })">Bild löschen</button>
                   </div>
   
                   <div class="mb-3">
@@ -316,13 +300,12 @@ function renderAdminCoupons(coupons) {
               <div class="product-card ${statusClass}">
                   <h3>Code: ${coupon.code}</h3>
                   <p><strong>Wert: € ${parseFloat(coupon.wert).toFixed(
-                    2
-                  )}</strong></p>
+      2
+    )}</strong></p>
                   <p>Gültig bis: ${coupon.valid_until}</p>
                   <p>Status: ${statusText}</p>
-                  <button class="btn btn-danger btn-sm w-100 mt-2" onclick="deleteCoupon(${
-                    coupon.id
-                  })">🗑️ Löschen</button>
+                  <button class="btn btn-danger btn-sm w-100 mt-2" onclick="deleteCoupon(${coupon.id
+      })">🗑️ Löschen</button>
               </div>
           </div>
       `);
@@ -389,15 +372,13 @@ function renderCustomers(customers) {
             <p><strong>Email:</strong> ${c.email}</p>
             <p><strong>Ort:</strong> ${c.ort}</p>
   
-            <button class="btn btn-primary btn-sm me-2" onclick="viewOrders(${
-              c.id
-            })">
+            <button class="btn btn-primary btn-sm me-2" onclick="viewOrders(${c.id
+      })">
               Bestellungen ansehen
             </button>
   
-            <button class="btn btn-warning btn-sm" onclick="toggleActivation(${
-              c.id
-            }, '${c.is_active}')">
+            <button class="btn btn-warning btn-sm" onclick="toggleActivation(${c.id
+      }, '${c.is_active}')">
               ${c.is_active == "active" ? "Deaktivieren" : "Aktivieren"}
             </button>
           </div>
@@ -473,9 +454,8 @@ function showOrders(orders) {
         order.items.forEach((item) => {
           const gesamt = item.quantity * item.price;
           const produktname = `${item.marke} ${item.modell}`;
-          const bildUrl = `/Zeitwert/Backend/productpictures/${
-            item.bild_url || "fallback.jpg"
-          }`;
+          const bildUrl = `/Zeitwert/Backend/productpictures/${item.bild_url || "fallback.jpg"
+            }`;
 
           html += `
             <div class="col-md-6">
@@ -487,15 +467,13 @@ function showOrders(orders) {
                     <label>Menge:</label>
                     <input type="number" min="1" value="${item.quantity}" 
                         id="qty-${item.id}" style="width: 60px;" />
-                    <button class="btn btn-sm btn-outline-success" onclick="confirmQuantity(${
-                      item.id
-                    })">✔️</button>
+                    <button class="btn btn-sm btn-outline-success" onclick="confirmQuantity(${item.id
+            })">✔️</button>
 
                   </div>
                   <p><strong>Gesamt: €${gesamt.toFixed(2)}</strong></p>
-                  <button class="btn btn-sm btn-danger" onclick="deleteOrderItem(${
-                    item.id
-                  })">🗑️ Löschen</button>
+                  <button class="btn btn-sm btn-danger" onclick="deleteOrderItem(${item.id
+            })">🗑️ Löschen</button>
                 </div>
               </div>
             </div>
