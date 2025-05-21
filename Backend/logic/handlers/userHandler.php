@@ -1,5 +1,6 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) session_start();
+if (session_status() === PHP_SESSION_NONE)
+    session_start();
 
 require_once(__DIR__ . '/../../config/dbaccess.php');
 require_once(__DIR__ . '/../../models/user.class.php');
@@ -10,7 +11,7 @@ $action = $_POST['action'] ?? '';
 $response = ['success' => false];
 
 
-// ===== getUserData (nur für eingeloggte Kunden) =====
+// ===== Get User Data =====
 if ($action === 'getUserData') {
     requireLogin();
 
@@ -33,7 +34,7 @@ if ($action === 'getUserData') {
 }
 
 
-// ===== listCustomers (Admin) =====
+// ===== ADMIN: List all Customers =====
 elseif ($action === 'listCustomers') {
     requireAdmin();
 
@@ -43,7 +44,7 @@ elseif ($action === 'listCustomers') {
 }
 
 
-// ===== toggleCustomer (Admin) =====
+// ===== ADMIN: Toggle Customer Status =====
 elseif ($action === 'toggleCustomer') {
     requireAdmin();
 
@@ -62,7 +63,7 @@ elseif ($action === 'toggleCustomer') {
 }
 
 
-// ===== getCustomerOrders (Admin) =====
+// ===== ADMIN: Read Orders =====
 elseif ($action === 'getCustomerOrders') {
     requireAdmin();
 
@@ -80,7 +81,7 @@ elseif ($action === 'getCustomerOrders') {
     }
 }
 
-// ===== deleteOrderItem (Admin) =====
+// ===== ADMIN: Delete Order Items from Order  =====
 elseif ($action === 'deleteOrderItem') {
     requireAdmin();
 
@@ -98,7 +99,7 @@ elseif ($action === 'deleteOrderItem') {
     }
 }
 
-// ===== updateOrderItemQuantity (Admin) =====
+// ===== ADMIN: Update Order Item Quantity =====
 elseif ($action === 'updateOrderItemQuantity') {
     requireAdmin();
 

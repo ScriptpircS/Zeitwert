@@ -127,7 +127,7 @@ elseif ($action === 'loadPaymentMethods') {
                 'details' => $masked
             ];
         }, $rawdata);
-        
+
         $response['success'] = true;
         $response['data'] = $maskedData;
     } catch (Exception $e) {

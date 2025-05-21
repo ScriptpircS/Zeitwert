@@ -1,13 +1,15 @@
 <?php
-class dbaccess {
+class dbaccess
+{
     private $pdo;
     private static $instance = null;
 
-    private function __construct() {
+    private function __construct()
+    {
         $host = 'localhost';
         $dbname = 'zeitwert';
         $user = 'root';
-        $pass = ''; 
+        $pass = '';
 
         try {
             $this->pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
@@ -18,7 +20,8 @@ class dbaccess {
     }
 
     // Singleton-Pattern
-    public static function getInstance() {
+    public static function getInstance()
+    {
         if (self::$instance === null) {
             self::$instance = new dbaccess();
         }
@@ -26,25 +29,29 @@ class dbaccess {
     }
 
     // SELECT
-    public function select($sql, $params = []) {
+    public function select($sql, $params = [])
+    {
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function selectSingle($sql, $params = []) {
-    $result = $this->select($sql, $params);
-    return $result[0] ?? null;
+    public function selectSingle($sql, $params = [])
+    {
+        $result = $this->select($sql, $params);
+        return $result[0] ?? null;
     }
 
     // INSERT, UPDATE, DELETE
-    public function execute($sql, $params = []) {
+    public function execute($sql, $params = [])
+    {
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute($params);
     }
 
     // Letzter Insert-ID (z. B. nach User-Registrierung)
-    public function getLastInsertId() {
+    public function getLastInsertId()
+    {
         return $this->pdo->lastInsertId();
     }
 }

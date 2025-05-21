@@ -1,5 +1,6 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) session_start();
+if (session_status() === PHP_SESSION_NONE)
+    session_start();
 
 require_once(__DIR__ . '/../../config/dbaccess.php');
 require_once(__DIR__ . '/../../models/product.class.php');
@@ -9,14 +10,12 @@ $productModel = new Product();
 $action = $_POST['action'] ?? '';
 $response = ['success' => false];
 
-// Öffentliche Produktabfragen
+// ========== ADMIN: Read all Products ==========
 if ($action === 'getProducts') {
     $products = $productModel->getAllProducts();
     $response['success'] = true;
     $response['products'] = $products;
-}
-
-elseif ($action === 'getProduct') {
+} elseif ($action === 'getProduct') {
     $productId = $_POST['id'] ?? null;
     if ($productId) {
         $product = $productModel->getProductById($productId);
@@ -29,9 +28,7 @@ elseif ($action === 'getProduct') {
     } else {
         $response['message'] = "Produkt-ID fehlt.";
     }
-}
-
-elseif ($action === 'getProductsByCategory') {
+} elseif ($action === 'getProductsByCategory') {
     $catId = $_POST['categoryId'] ?? null;
     if ($catId !== null) {
         $products = $productModel->getProductsByCategory($catId);
@@ -40,9 +37,7 @@ elseif ($action === 'getProductsByCategory') {
     } else {
         $response['message'] = "Keine Kategorie-ID übergeben.";
     }
-}
-
-elseif ($action === 'searchProducts') {
+} elseif ($action === 'searchProducts') {
     $query = $_POST['query'] ?? '';
     $results = $productModel->searchProducts($query);
     if (empty($results)) {
@@ -54,7 +49,7 @@ elseif ($action === 'searchProducts') {
     }
 }
 
-// ========== ADMIN: CREATE ==========
+// ========== ADMIN: Create new Produkt ==========
 elseif ($action === 'createProduct') {
     requireAdmin();
 
@@ -96,7 +91,7 @@ elseif ($action === 'createProduct') {
     }
 }
 
-// ========== ADMIN: UPDATE ==========
+// ========== ADMIN: Update Product Details ==========
 elseif ($action === 'updateProduct') {
     requireAdmin();
 
@@ -136,7 +131,7 @@ elseif ($action === 'updateProduct') {
     }
 }
 
-// ========== ADMIN: DELETE ==========
+// ========== ADMIN: Delete Products ==========
 elseif ($action === 'deleteProduct') {
     requireAdmin();
 
@@ -147,9 +142,7 @@ elseif ($action === 'deleteProduct') {
     } else {
         $response['message'] = "Fehler beim Löschen.";
     }
-}
-
-elseif ($action === 'deleteImage') {
+} elseif ($action === 'deleteImage') {
     requireAdmin();
 
     $productId = $_POST['id'] ?? null;

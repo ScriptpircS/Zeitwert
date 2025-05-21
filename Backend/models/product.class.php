@@ -2,31 +2,37 @@
 
 require_once(__DIR__ . '/../config/dbaccess.php');
 
-class Product {
+class Product
+{
     private $db;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->db = dbaccess::getInstance();
     }
 
-    public function getAllProducts() {
+    public function getAllProducts()
+    {
         $sql = "SELECT * FROM products";
         return $this->db->select($sql);
     }
 
-    public function getProductsByCategory($categoryId) {
+    public function getProductsByCategory($categoryId)
+    {
         $sql = "SELECT * FROM products WHERE category_id = ?";
         return $this->db->select($sql, [$categoryId]);
     }
 
-    public function getProductById($id) {
+    public function getProductById($id)
+    {
         $sql = "SELECT * FROM products WHERE id = :id";
         $params = [':id' => $id];
-    
+
         return $this->db->select($sql, $params)[0] ?? null;
     }
-    
-    public function searchProducts($query) {
+
+    public function searchProducts($query)
+    {
         $likeQuery = strtolower($query) . '%';
 
         $sql = "SELECT * FROM products 
@@ -39,8 +45,8 @@ class Product {
                     LOWER(referenz) LIKE ?";
 
         return $this->db->select($sql, [
-            $likeQuery,      
-            '% ' . $likeQuery, 
+            $likeQuery,
+            '% ' . $likeQuery,
             $likeQuery,
             '% ' . $likeQuery,
             $likeQuery,
@@ -48,7 +54,9 @@ class Product {
         ]);
     }
 
-    public function createProduct($data) {
+    // ========== ADMIN: Create Produkt in DB ==========
+    public function createProduct($data)
+    {
         $sql = "INSERT INTO products (
             marke, modell, beschreibung, preis, bild_url,
             referenz, lunette, gehaeuse, uhrwerk, armband,
@@ -61,7 +69,9 @@ class Product {
         return $this->db->execute($sql, $data);
     }
 
-    public function updateProduct($data) {
+    // ========== ADMIN: Update Produktdetails in DB ==========
+    public function updateProduct($data)
+    {
         $set = "
                 marke = :marke,
                 modell = :modell,
@@ -83,15 +93,19 @@ class Product {
         return $this->db->execute($sql, $data);
     }
 
-    public function deleteProduct($id) {
+    // ========== ADMIN: Delete Produkt in DB ==========
+    public function deleteProduct($id)
+    {
         $sql = "DELETE FROM products WHERE id = ?";
         return $this->db->execute($sql, [$id]);
     }
 
-    public function deleteProductImage($id) {
+    // ========== ADMIN: Delete Produktimage in DB ==========
+    public function deleteProductImage($id)
+    {
         $sql = "UPDATE products SET bild_url = NULL WHERE id = ?";
         return $this->db->execute($sql, [$id]);
     }
-    
-    
+
+
 }
