@@ -15,8 +15,8 @@ function loadNavbar() {
   document.body.style.visibility = "hidden";
 
   fetch(navbarPath)
-    .then(res => res.text())
-    .then(html => {
+    .then((res) => res.text())
+    .then((html) => {
       const navbarContainer = document.createElement("div");
       navbarContainer.innerHTML = html;
       document.body.insertBefore(navbarContainer, document.body.firstChild);
@@ -31,7 +31,10 @@ function loadNavbar() {
         initDragAndDrop();
       }
 
-      if (document.getElementById("warenkorbContainer") && typeof ladeWarenkorb === "function") {
+      if (
+        document.getElementById("warenkorbContainer") &&
+        typeof ladeWarenkorb === "function"
+      ) {
         ladeWarenkorb();
       }
 
@@ -55,10 +58,12 @@ function fixNavbarLinks(prefix) {
     orderHistoryLink: "Frontend/sites/orderHistory.html",
     adminProductsLink: "Frontend/sites/admin/products.html",
     adminCustomersLink: "Frontend/sites/admin/customers.html",
-    adminCouponsLink: "Frontend/sites/admin/coupons.html"
+    adminCouponsLink: "Frontend/sites/admin/coupons.html",
   };
 
-  document.querySelector(".navbar-brand")?.setAttribute("href", prefix + linkMap["Zeitwert"]);
+  document
+    .querySelector(".navbar-brand")
+    ?.setAttribute("href", prefix + linkMap["Zeitwert"]);
 
   for (const [id, path] of Object.entries(linkMap)) {
     const el = document.getElementById(id);
@@ -71,16 +76,22 @@ function handleUserSession(prefix) {
   const sessionPath = prefix + "Backend/logic/utils/getUserSession.php";
 
   fetch(sessionPath)
-    .then(res => res.json())
-    .then(data => {
+    .then((res) => res.json())
+    .then((data) => {
       if (data.loggedIn) {
-        $("#welcomeUser").text("Hallo, " + data.username).removeClass("d-none");
+        $("#welcomeUser")
+          .text("Hallo, " + data.username)
+          .removeClass("d-none");
         $("#loginLink, #registerLink").addClass("d-none");
         $("#logoutLink, #accountLink, #orderHistoryLink").removeClass("d-none");
 
         if (data.role === "admin") {
-          $("#adminProductsLink, #adminCustomersLink, #adminCouponsLink, #logoutLink").removeClass("d-none");
-          $("#accountLink, #orderHistoryLink, #Warenkorb, #loginLink, #registerLink").addClass("d-none");
+          $(
+            "#adminProductsLink, #adminCustomersLink, #adminCouponsLink, #logoutLink"
+          ).removeClass("d-none");
+          $(
+            "#accountLink, #orderHistoryLink, #Warenkorb, #loginLink, #registerLink"
+          ).addClass("d-none");
         }
       }
     });
@@ -94,8 +105,8 @@ function initLogout(prefix) {
       const logoutPath = prefix + "Backend/logic/utils/logout.php";
 
       fetch(logoutPath)
-        .then(() => window.location.href = prefix + "index.html")
-        .catch(err => console.error("Logout fehlgeschlagen:", err));
+        .then(() => (window.location.href = prefix + "index.html"))
+        .catch((err) => console.error("Logout fehlgeschlagen:", err));
     }
   });
 }
@@ -121,8 +132,8 @@ async function checkAutoLogin() {
       type: "POST",
       data: {
         action: "autoLogin",
-        loginCredentials: savedUser
-      }
+        loginCredentials: savedUser,
+      },
     });
 
     if (response.success) {
@@ -138,8 +149,8 @@ async function checkAutoLogin() {
 // Zugriffsschutz je nach Rolle
 function protectPage({ requireLogin = false, requireAdmin = false }) {
   fetch(getPrefix() + "Backend/logic/utils/getUserSession.php")
-    .then(res => res.json())
-    .then(data => {
+    .then((res) => res.json())
+    .then((data) => {
       if (!data.loggedIn && requireLogin) {
         show403();
       } else if (requireAdmin && data.role !== "admin") {
@@ -152,7 +163,8 @@ function protectPage({ requireLogin = false, requireAdmin = false }) {
 }
 
 function show403() {
-  document.body.innerHTML = "<h1 style='text-align:center; margin-top:50px;'>❌ Fehler 403 – Zugriff auf seite verweigert</h1>";
+  document.body.innerHTML =
+    "<h1 style='text-align:center; margin-top:50px;'>❌ Fehler 403 – Zugriff auf seite verweigert</h1>";
   document.title = "403 - Forbidden";
   document.body.style.visibility = "visible";
 }

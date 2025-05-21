@@ -24,67 +24,100 @@ function checkLoginStatusAndLoadCheckout() {
     error: function () {
       console.error("Fehler beim Login-Check");
       window.location.href = "../../index.html";
-    }
+    },
   });
 }
 
 function ladeCheckoutWarenkorb() {
-  $.post("../../Backend/logic/requestHandler.php", { action: "getCart" }, function (response) {
-    const $ul = $("#checkoutCartSummary").empty();
-    if (!response.success || !response.cart) {
-      $("#checkoutPrice").text("Keine Produkte im Warenkorb.");
-      return;
-    }
+  $.post(
+    "../../Backend/logic/requestHandler.php",
+    { action: "getCart" },
+    function (response) {
+      const $ul = $("#checkoutCartSummary").empty();
+      if (!response.success || !response.cart) {
+        $("#checkoutPrice").text("Keine Produkte im Warenkorb.");
+        return;
+      }
 
-    $.each(response.cart, (productId, item) => {
-      const produkt = item.product;
-      const menge = item.qty;
-      const $li = $(`<li>${menge}x ${produkt.marke} - ${produkt.modell} (€ ${produkt.preis})</li>`);
-      $ul.append($li);
-    });
+      $.each(response.cart, (productId, item) => {
+        const produkt = item.product;
+        const menge = item.qty;
+        const $li = $(
+          `<li>${menge}x ${produkt.marke} - ${produkt.modell} (€ ${produkt.preis})</li>`
+        );
+        $ul.append($li);
+      });
 
-    $("#checkoutPrice").html("Gesamtpreis: € " + parseFloat(response.gesamtpreis).toFixed(2));
-  }, "json");
+      $("#checkoutPrice").html(
+        "Gesamtpreis: € " + parseFloat(response.gesamtpreis).toFixed(2)
+      );
+    },
+    "json"
+  );
 }
 
 function ladeNutzerdaten() {
-  $.post("../../Backend/logic/requestHandler.php", { action: "getUserData" }, function (response) {
-    if (response.success && response.user) {
-      const user = response.user;
-      $("#anrede").val(user.anrede);
-      $("#firstname").val(user.vorname);
-      $("#lastname").val(user.nachname);
-      $("#street").val(user.adresse);
-      $("#plz").val(user.plz);
-      $("#ort").val(user.ort);
-    }
-  }, "json");
+  $.post(
+    "../../Backend/logic/requestHandler.php",
+    { action: "getUserData" },
+    function (response) {
+      if (response.success && response.user) {
+        const user = response.user;
+        $("#anrede").val(user.anrede);
+        $("#firstname").val(user.vorname);
+        $("#lastname").val(user.nachname);
+        $("#street").val(user.adresse);
+        $("#plz").val(user.plz);
+        $("#ort").val(user.ort);
+      }
+    },
+    "json"
+  );
 }
 
 function ladeZahlungsarten() {
-  $.post("../../Backend/logic/requestHandler.php", { action: "getPaymentMethods" }, function (response) {
-    const $container = $("#payment_methods").empty();
-    $container.append('<h2 class="h5">Zahlungsinformationen:</h2>');
+  $.post(
+    "../../Backend/logic/requestHandler.php",
+    { action: "getPaymentMethods" },
+    function (response) {
+      const $container = $("#payment_methods").empty();
+      $container.append('<h2 class="h5">Zahlungsinformationen:</h2>');
 
-    if (response.success && Array.isArray(response.methods) && response.methods.length > 0) {
-      const $select = $('<select class="form-select" name="payment_method" id="payment_method" required></select>');
-      $select.append('<option value="">Zahlungsmethode wählen</option>');
+      if (
+        response.success &&
+        Array.isArray(response.methods) &&
+        response.methods.length > 0
+      ) {
+        const $select = $(
+          '<select class="form-select" name="payment_method" id="payment_method" required></select>'
+        );
+        $select.append('<option value="">Zahlungsmethode wählen</option>');
 
-      response.methods.forEach(method => {
+        response.methods.forEach((method) => {
+          const option = `<option value="${method.id}">${method.type}</option>`;
+          $select.append(option);
+        });
 
-        const option = `<option value="${method.id}">${method.type}</option>`;
-        $select.append(option);
-      });
-
-      $container.append($select);
-    } else {
-      $container.append('<p>Keine Zahlungsarten hinterlegt. Bitte lege eine Zahlungsart im Profil an!</p><br><a href="account.html" class="btn btn-primary">Zum Account</a>');
-    }
-  }, "json");
+        $container.append($select);
+      } else {
+        $container.append(
+          '<p>Keine Zahlungsarten hinterlegt. Bitte lege eine Zahlungsart im Profil an!</p><br><a href="account.html" class="btn btn-primary">Zum Account</a>'
+        );
+      }
+    },
+    "json"
+  );
 }
 
 function validateCheckoutForm() {
-  const requiredFields = ["#firstname", "#lastname", "#street", "#plz", "#ort", "#payment_method"];
+  const requiredFields = [
+    "#firstname",
+    "#lastname",
+    "#street",
+    "#plz",
+    "#ort",
+    "#payment_method",
+  ];
   for (const selector of requiredFields) {
     if (!$(selector).val()) {
       alert("Bitte fülle alle erforderlichen Felder aus.");
@@ -108,23 +141,36 @@ $(document).on("click", "#applyCouponBtn", function () {
     return;
   }
 
-  $.post("../../Backend/logic/requestHandler.php", {
-    action: "validateCoupon",
-    code: code
-  }, function (response) {
-    if (response.success) {
-      eingelösterGutschein = response.coupon;
-      const rabatt = parseFloat(response.coupon.wert);
-      const neuerPreis = berechneNeuenPreis(rabatt);
-      $("#couponMessage").removeClass("text-danger").addClass("text-success")
-        .text(`Gutschein gültig! €${rabatt.toFixed(2)} werden abgezogen.`);
-      $("#checkoutPrice").html(`Gesamtpreis nach Gutschein: <strong>€ ${neuerPreis.toFixed(2)}</strong>`);
-    } else {
-      eingelösterGutschein = null;
-      $("#couponMessage").removeClass("text-success").addClass("text-danger")
-        .text("Ungültiger oder abgelaufener Gutscheincode.");
-    }
-  }, "json");
+  $.post(
+    "../../Backend/logic/requestHandler.php",
+    {
+      action: "validateCoupon",
+      code: code,
+    },
+    function (response) {
+      if (response.success) {
+        eingelösterGutschein = response.coupon;
+        const rabatt = parseFloat(response.coupon.wert);
+        const neuerPreis = berechneNeuenPreis(rabatt);
+        $("#couponMessage")
+          .removeClass("text-danger")
+          .addClass("text-success")
+          .text(`Gutschein gültig! €${rabatt.toFixed(2)} werden abgezogen.`);
+        $("#checkoutPrice").html(
+          `Gesamtpreis nach Gutschein: <strong>€ ${neuerPreis.toFixed(
+            2
+          )}</strong>`
+        );
+      } else {
+        eingelösterGutschein = null;
+        $("#couponMessage")
+          .removeClass("text-success")
+          .addClass("text-danger")
+          .text("Ungültiger oder abgelaufener Gutscheincode.");
+      }
+    },
+    "json"
+  );
 });
 
 $("#checkoutForm").on("submit", function (e) {
@@ -140,16 +186,21 @@ $("#checkoutForm").on("submit", function (e) {
     ort: $("#ort").val(),
     country: $("#country").val(),
     payment_method: $("#payment_method").val(),
-    coupon_code: eingelösterGutschein ? eingelösterGutschein.code : null
+    coupon_code: eingelösterGutschein ? eingelösterGutschein.code : null,
   };
 
-  $.post("../../Backend/logic/requestHandler.php", bestellDaten, function (response) {
-    if (response.success) {
-      alert("Bestellung erfolgreich!");
-      fetchCartCount();
-      $('#checkoutBody').html("<h1>Bestellung aufgegeben!</h1>");
-    } else {
-      alert("Fehler bei Bestellung: " + response.message);
-    }
-  }, "json");
+  $.post(
+    "../../Backend/logic/requestHandler.php",
+    bestellDaten,
+    function (response) {
+      if (response.success) {
+        alert("Bestellung erfolgreich!");
+        fetchCartCount();
+        $("#checkoutBody").html("<h1>Bestellung aufgegeben!</h1>");
+      } else {
+        alert("Fehler bei Bestellung: " + response.message);
+      }
+    },
+    "json"
+  );
 });

@@ -5,10 +5,11 @@ function ladeWarenkorb() {
     data: { action: "getCart" },
     dataType: "json",
     success: function (response) {
-
-      if(!response.success) {
-        $("#warenkorbContainer").html("<p>Fehler beim Laden des Warenkorbs.</p>");
-      return;
+      if (!response.success) {
+        $("#warenkorbContainer").html(
+          "<p>Fehler beim Laden des Warenkorbs.</p>"
+        );
+        return;
       }
 
       const cart = response.cart;
@@ -17,7 +18,9 @@ function ladeWarenkorb() {
 
       if (!cart || Object.keys(cart).length === 0) {
         $container.html("<p>🛒 Dein Warenkorb ist leer.</p>");
-        $cocontainer.html('<a href="../../index.html" class="btn btn-success mt-4" id="toIndex">Zu den Uhren</a>');
+        $cocontainer.html(
+          '<a href="../../index.html" class="btn btn-success mt-4" id="toIndex">Zu den Uhren</a>'
+        );
         $("#cart-count").text("0");
         return;
       }
@@ -35,7 +38,9 @@ function ladeWarenkorb() {
         const $card = $(`
           <div class="col-sm-6 col-md-4 col-lg-3">
             <div class="product-card warenkorb-card" draggable="true" data-id="${productId}">
-              <img src="/Zeitwert/Backend/productpictures/${produkt.bild_url || "fallback.jpg"}" alt="${produkt.modell || "Produkt"}" style="max-width:150px;">
+              <img src="/Zeitwert/Backend/productpictures/${
+                produkt.bild_url || "fallback.jpg"
+              }" alt="${produkt.modell || "Produkt"}" style="max-width:150px;">
               <h3>${produkt.marke || "Unbekannt"} – ${produkt.modell || ""}</h3>
               <p>Einzelpreis: € ${parseFloat(produkt.preis).toFixed(2)}</p>
               <p>Gesamt: <strong>€ ${preis.toFixed(2)}</strong></p>
@@ -52,69 +57,74 @@ function ladeWarenkorb() {
       });
 
       $container.append(
-        `<div class="col-12"><hr><h4>🧾 Gesamtbetrag: € ${gesamtpreis.toFixed(2)}</h4></div>`
+        `<div class="col-12"><hr><h4>🧾 Gesamtbetrag: € ${gesamtpreis.toFixed(
+          2
+        )}</h4></div>`
       );
 
-      $cocontainer.html('<a href="order.html" class="btn btn-success mt-4" id="toCheckout">Zur Kasse</a>');
+      $cocontainer.html(
+        '<a href="order.html" class="btn btn-success mt-4" id="toCheckout">Zur Kasse</a>'
+      );
       $("#cart-count").text(response.gesamtmenge);
     },
     error: function (xhr, status, error) {
       console.error("Fehler beim Laden des Warenkorbs:", error);
-      $("#warenkorbContainer").html("<p>Ein Fehler ist aufgetreten. Bitte versuche es erneut.</p>");
-    }
+      $("#warenkorbContainer").html(
+        "<p>Ein Fehler ist aufgetreten. Bitte versuche es erneut.</p>"
+      );
+    },
   });
 }
-  
-  function entferneProdukt(productId) {
-    $.ajax({
-      url: "http://localhost/Zeitwert/Backend/logic/requestHandler.php",
-      type: "POST",
-      data: {
-        action: "removeFromCart",
-        productId: productId,
-      },
-      success: function () {
-        ladeWarenkorb();
-      },
-      error: function (xhr, status, error) {
-        console.error("Fehler beim Entfernen des Produkts:", error);
-      },
-    });
-  }
-  
-  function aktualisiereMenge(productId, menge) {
-    $.ajax({
-      url: "http://localhost/Zeitwert/Backend/logic/requestHandler.php",
-      type: "POST",
-      data: {
-        action: "updateCartQuantity",
-        productId: productId,
-        quantity: parseInt(menge),
-      },
-      success: function () {
-        ladeWarenkorb();
-      },
-      error: function (xhr, status, error) {
-        console.error("Fehler beim Aktualisieren der Menge:", error);
-      },
-    });
-  }
-  
-  function fetchCartCount() {
-    $.ajax({
-      url: "http://localhost/Zeitwert/Backend/logic/requestHandler.php",
-      type: "POST",
-      data: { action: "getCart" },
-      dataType: "json",
-      success: function (res) {
-        if (res.success) {
-          $("#cart-count").text(res.gesamtmenge);
-        }
-      },
-    });
-  }
-  
-  
+
+function entferneProdukt(productId) {
+  $.ajax({
+    url: "http://localhost/Zeitwert/Backend/logic/requestHandler.php",
+    type: "POST",
+    data: {
+      action: "removeFromCart",
+      productId: productId,
+    },
+    success: function () {
+      ladeWarenkorb();
+    },
+    error: function (xhr, status, error) {
+      console.error("Fehler beim Entfernen des Produkts:", error);
+    },
+  });
+}
+
+function aktualisiereMenge(productId, menge) {
+  $.ajax({
+    url: "http://localhost/Zeitwert/Backend/logic/requestHandler.php",
+    type: "POST",
+    data: {
+      action: "updateCartQuantity",
+      productId: productId,
+      quantity: parseInt(menge),
+    },
+    success: function () {
+      ladeWarenkorb();
+    },
+    error: function (xhr, status, error) {
+      console.error("Fehler beim Aktualisieren der Menge:", error);
+    },
+  });
+}
+
+function fetchCartCount() {
+  $.ajax({
+    url: "http://localhost/Zeitwert/Backend/logic/requestHandler.php",
+    type: "POST",
+    data: { action: "getCart" },
+    dataType: "json",
+    success: function (res) {
+      if (res.success) {
+        $("#cart-count").text(res.gesamtmenge);
+      }
+    },
+  });
+}
+
 // ========== DRAG & DROP WARENKORB ==========
 
 function initDragAndDrop() {
@@ -149,7 +159,7 @@ function initDragAndDrop() {
       type: "POST",
       data: {
         action: "addToCart",
-        productId: productId
+        productId: productId,
       },
       dataType: "json",
       success: function (response) {
@@ -162,13 +172,11 @@ function initDragAndDrop() {
       },
       error: function (xhr, status, error) {
         console.error("Drag-Drop Fehler:", error);
-      }
+      },
     });
   });
 }
 
-
 function initCartUI() {
   fetchCartCount();
 }
-

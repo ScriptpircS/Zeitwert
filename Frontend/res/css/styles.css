@@ -1,65 +1,69 @@
 .product-card {
-    width: 250px;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    padding: 15px;
-    text-align: center;
-    box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
-    background-color: white;
-    margin: 10px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 100%;
-  }
-  
-  .product-card img {
-    width: 100%;
-    height: auto;
-    border-radius: 8px;
-  }
-  
-  .product-card h3 {
-    margin: 10px 0 5px;
-    font-size: 18px;
-  }
-  
-  .product-card p {
-    margin: 0;
-  }
-  
-  .stars {
-    color: gold;
-  }
-  
-  .bg-light {
-    --bs-bg-opacity: 1;
-    background-color: 	#F4E9DC !important;
+  width: 250px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 15px;
+  text-align: center;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+  background-color: white;
+  margin: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.product-card img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.product-card h3 {
+  margin: 10px 0 5px;
+  font-size: 18px;
+}
+
+.product-card p {
+  margin: 0;
+}
+
+.stars {
+  color: gold;
+}
+
+.bg-light {
+  --bs-bg-opacity: 1;
+  background-color: #f4e9dc !important;
 }
 
 /* Schriftart für Navbar */
-.navbar, .navbar a, .navbar .nav-link, .navbar-brand, .navbar-brand ms-2 {
-  font-family: 'Montserrat', sans-serif, 	#3B2A1C;
+.navbar,
+.navbar a,
+.navbar .nav-link,
+.navbar-brand,
+.navbar-brand ms-2 {
+  font-family: "Montserrat", sans-serif, #3b2a1c;
 }
 
 body {
-  background-color: #FAF3EC;
+  background-color: #faf3ec;
 }
 
 form {
   background-color: #f8f9fa;
   padding: 20px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  width: 100%; 
-  max-width: 400px; 
+  width: 100%;
+  max-width: 400px;
 }
 
 .custom-footer {
-  background-color: #3B2A1C;
+  background-color: #3b2a1c;
 }
 
 .custom-footer a {
-  color: #F4E9DC;
+  color: #f4e9dc;
 }
 
 .custom-footer a:hover {

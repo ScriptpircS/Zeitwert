@@ -1,209 +1,298 @@
 <!DOCTYPE html>
 <html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Mein Konto</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<head>
-  <meta charset="UTF-8">
-  <title>Mein Konto</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../res/css/styles.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="../res/css/styles.css" />
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="../res/css/styles.css">
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <link rel="stylesheet" href="../res/css/styles.css" />
+    <script>
+      window.accessRules = { requireLogin: true, requireAdmin: false };
+    </script>
+    <script src="../js/navbar.js" defer></script>
+    <script defer src="../js/cart.js"></script>
+    <script src="../js/account.js" defer></script>
+    <script src="../js/main.js" defer></script>
+    <script src="../js/footer.js" defer></script>
+  </head>
 
-  <script>window.accessRules = { requireLogin: true, requireAdmin: false };</script>
-  <script src="../js/navbar.js" defer></script>
-  <script defer src="../js/cart.js"></script>
-  <script src="../js/account.js" defer></script>
-  <script src="../js/main.js" defer></script>
-  <script src="../js/footer.js" defer></script>
-</head>
+  <body class="d-flex flex-column min-vh-100">
+    <main class="container my-5 flex-grow-1">
+      <h2 class="mb-4">Mein Konto</h2>
 
-<body class="d-flex flex-column min-vh-100">
+      <!-- Account-Daten -->
+      <div class="card shadow p-4">
+        <div class="card-body">
+          <h5 class="card-title">Deine Informationen</h5>
+          <p><strong>Anrede:</strong> <span id="anzeigeAnrede">-</span></p>
+          <p><strong>Vorname:</strong> <span id="anzeigeVorname">-</span></p>
+          <p><strong>Nachname:</strong> <span id="anzeigeNachname">-</span></p>
+          <p><strong>Adresse:</strong> <span id="anzeigeAdresse">-</span></p>
+          <p><strong>PLZ:</strong> <span id="anzeigePLZ">-</span></p>
+          <p><strong>Ort:</strong> <span id="anzeigeOrt">-</span></p>
+          <p>
+            <strong>Zahlungsinfo:</strong> <span id="anzeigeZahlung">-</span>
+          </p>
 
-  <main class="container my-5 flex-grow-1">
-    <h2 class="mb-4">Mein Konto</h2>
-
-    <!-- Account-Daten -->
-    <div class="card shadow p-4">
-      <div class="card-body">
-        <h5 class="card-title">Deine Informationen</h5>
-        <p><strong>Anrede:</strong> <span id="anzeigeAnrede">-</span></p>
-        <p><strong>Vorname:</strong> <span id="anzeigeVorname">-</span></p>
-        <p><strong>Nachname:</strong> <span id="anzeigeNachname">-</span></p>
-        <p><strong>Adresse:</strong> <span id="anzeigeAdresse">-</span></p>
-        <p><strong>PLZ:</strong> <span id="anzeigePLZ">-</span></p>
-        <p><strong>Ort:</strong> <span id="anzeigeOrt">-</span></p>
-        <p><strong>Zahlungsinfo:</strong> <span id="anzeigeZahlung">-</span></p>
-
-        <button type="button" class="btn btn-primary mt-4" data-bs-toggle="modal" data-bs-target="#editModal">
-          Daten ändern
-        </button>
-      </div>
-    </div>
-
-    <!-- Statusmeldung -->
-    <div id="updateMessage" class="mt-3"></div>
-  </main>
-
-   <!-- Modal Adress-/Zahlungs-/Passwort-Änderung) -->
-  <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Daten ändern</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          <button
+            type="button"
+            class="btn btn-primary mt-4"
+            data-bs-toggle="modal"
+            data-bs-target="#editModal"
+          >
+            Daten ändern
+          </button>
         </div>
-        <div class="modal-body">
-          <ul class="nav nav-tabs" id="tabSelector" role="tablist">
-            <li class="nav-item">
-              <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#adresseTab">Adresse</button>
-            </li>
-            <li class="nav-item">
-              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#zahlungTab">Zahlung</button>
-            </li>
-            <li class="nav-item">
-              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#passwortTab">Passwort</button>
-            </li>
-          </ul>
+      </div>
 
-          <div class="tab-content pt-3">
-            <!-- Adresse ändern -->
-            <div class="tab-pane fade show active" id="adresseTab">
-              <form id="adresseForm">
-                <div class="row g-2">
-                  <div class="col-md-3">
-                    <label class="form-label">Anrede</label>
-                    <input name="anrede" class="form-control">
+      <!-- Statusmeldung -->
+      <div id="updateMessage" class="mt-3"></div>
+    </main>
+
+    <!-- Modal Adress-/Zahlungs-/Passwort-Änderung) -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Daten ändern</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <ul class="nav nav-tabs" id="tabSelector" role="tablist">
+              <li class="nav-item">
+                <button
+                  class="nav-link active"
+                  data-bs-toggle="tab"
+                  data-bs-target="#adresseTab"
+                >
+                  Adresse
+                </button>
+              </li>
+              <li class="nav-item">
+                <button
+                  class="nav-link"
+                  data-bs-toggle="tab"
+                  data-bs-target="#zahlungTab"
+                >
+                  Zahlung
+                </button>
+              </li>
+              <li class="nav-item">
+                <button
+                  class="nav-link"
+                  data-bs-toggle="tab"
+                  data-bs-target="#passwortTab"
+                >
+                  Passwort
+                </button>
+              </li>
+            </ul>
+
+            <div class="tab-content pt-3">
+              <!-- Adresse ändern -->
+              <div class="tab-pane fade show active" id="adresseTab">
+                <form id="adresseForm">
+                  <div class="row g-2">
+                    <div class="col-md-3">
+                      <label class="form-label">Anrede</label>
+                      <input name="anrede" class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">Vorname</label>
+                      <input name="vorname" class="form-control" />
+                    </div>
+                    <div class="col-md-5">
+                      <label class="form-label">Nachname</label>
+                      <input name="nachname" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Adresse</label>
+                      <input name="adresse" class="form-control" />
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label">PLZ</label>
+                      <input name="plz" class="form-control" />
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label">Ort</label>
+                      <input name="ort" class="form-control" />
+                    </div>
+                    <div class="col-12 mt-2">
+                      <label class="form-label">Passwort zur Bestätigung</label>
+                      <input
+                        type="password"
+                        name="password"
+                        class="form-control"
+                      />
+                    </div>
+                    <div class="col-12 mt-3">
+                      <button type="submit" class="btn btn-success">
+                        Anschrift speichern
+                      </button>
+                    </div>
                   </div>
-                  <div class="col-md-4">
-                    <label class="form-label">Vorname</label>
-                    <input name="vorname" class="form-control">
+                </form>
+              </div>
+
+              <!-- Zahlung ändern -->
+              <div class="tab-pane fade" id="zahlungTab">
+                <form id="zahlungForm">
+                  <div class="mb-3">
+                    <table class="table table-striped">
+                      <thead>
+                        <tr>
+                          <th scope="col">Zahlungsart</th>
+                          <th scope="col">Details</th>
+                          <th scope="col">Aktionen</th>
+                        </tr>
+                      </thead>
+                      <tbody id="paymentTable">
+                        <!-- Dynamisch geladen -->
+                      </tbody>
+                    </table>
                   </div>
-                  <div class="col-md-5">
-                    <label class="form-label">Nachname</label>
-                    <input name="nachname" class="form-control">
+
+                  <div class="mb-3" id="add_payment_methods">
+                    <!-- Button "Neue Zahlungsart hinzufügen" wird hier eingefügt -->
                   </div>
-                  <div class="col-md-6">
-                    <label class="form-label">Adresse</label>
-                    <input name="adresse" class="form-control">
+
+                  <!-- Neue Zahlungsart -->
+                  <div
+                    id="neueZahlungsartForm"
+                    class="border rounded p-3"
+                    style="display: none"
+                  >
+                    <div class="mb-3">
+                      <label for="payment_type" class="form-label"
+                        >Zahlungsart</label
+                      >
+                      <select class="form-select" id="payment_type">
+                        <option value="">Bitte wählen</option>
+                        <option value="Kreditkarte">Kreditkarte</option>
+                        <option value="PayPal">PayPal</option>
+                        <option value="Bankeinzug">Bankeinzug</option>
+                      </select>
+                    </div>
+                    <div class="mb-3">
+                      <label for="payment_details" class="form-label"
+                        >Details</label
+                      >
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="payment_details"
+                        placeholder="IBAN oder E-Mail"
+                      />
+                    </div>
                   </div>
-                  <div class="col-md-3">
-                    <label class="form-label">PLZ</label>
-                    <input name="plz" class="form-control">
+
+                  <!-- Bestehende Zahlungsart bearbeiten -->
+                  <div
+                    id="aendereZahlungsartForm"
+                    class="border rounded p-3"
+                    style="display: none"
+                  >
+                    <div class="mb-3">
+                      <label for="updated_payment_type" class="form-label"
+                        >Zahlungsart</label
+                      >
+                      <select class="form-select" id="updated_payment_type">
+                        <option value="Kreditkarte">Kreditkarte</option>
+                        <option value="PayPal">PayPal</option>
+                        <option value="Bankeinzug">Bankeinzug</option>
+                      </select>
+                    </div>
+                    <div class="mb-3">
+                      <label for="updated_payment_details" class="form-label"
+                        >Details</label
+                      >
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="updated_payment_details"
+                        placeholder="Details"
+                      />
+                    </div>
                   </div>
-                  <div class="col-md-3">
-                    <label class="form-label">Ort</label>
-                    <input name="ort" class="form-control">
-                  </div>
+
+                  <!-- Gemeinsame Felder -->
                   <div class="col-12 mt-2">
                     <label class="form-label">Passwort zur Bestätigung</label>
-                    <input type="password" name="password" class="form-control">
+                    <input
+                      type="password"
+                      name="password"
+                      class="form-control"
+                    />
                   </div>
-                  <div class="col-12 mt-3">
-                    <button type="submit" class="btn btn-success">Anschrift speichern</button>
+
+                  <!-- Zentraler Button -->
+                  <div class="mt-3">
+                    <button type="submit" class="btn btn-success">
+                      Zahlung speichern
+                    </button>
                   </div>
-                </div>
-              </form>
-            </div>
+                </form>
+              </div>
 
-            <!-- Zahlung ändern -->
-            <div class="tab-pane fade" id="zahlungTab">
-              <form id="zahlungForm">
-                <div class="mb-3">
-                  <table class="table table-striped">
-                    <thead>
-                      <tr>
-                        <th scope="col">Zahlungsart</th>
-                        <th scope="col">Details</th>
-                        <th scope="col">Aktionen</th>
-                      </tr>
-                    </thead>
-                    <tbody id="paymentTable">
-                      <!-- Dynamisch geladen -->
-                    </tbody>
-                  </table>
-                </div>
-
-                <div class="mb-3" id="add_payment_methods">
-                  <!-- Button "Neue Zahlungsart hinzufügen" wird hier eingefügt -->
-                </div>
-
-                <!-- Neue Zahlungsart -->
-                <div id="neueZahlungsartForm" class="border rounded p-3" style="display:none;">
+              <!-- Passwort ändern -->
+              <div class="tab-pane fade" id="passwortTab">
+                <form id="passwortForm">
                   <div class="mb-3">
-                    <label for="payment_type" class="form-label">Zahlungsart</label>
-                    <select class="form-select" id="payment_type">
-                      <option value="">Bitte wählen</option>
-                      <option value="Kreditkarte">Kreditkarte</option>
-                      <option value="PayPal">PayPal</option>
-                      <option value="Bankeinzug">Bankeinzug</option>
-                    </select>
+                    <label class="form-label">Aktuelles Passwort</label>
+                    <input
+                      type="password"
+                      name="current_password"
+                      class="form-control"
+                    />
                   </div>
                   <div class="mb-3">
-                    <label for="payment_details" class="form-label">Details</label>
-                    <input type="text" class="form-control" id="payment_details" placeholder="IBAN oder E-Mail">
-                  </div>
-                </div>
-
-                <!-- Bestehende Zahlungsart bearbeiten -->
-                <div id="aendereZahlungsartForm" class="border rounded p-3" style="display:none;">
-                  <div class="mb-3">
-                    <label for="updated_payment_type" class="form-label">Zahlungsart</label>
-                    <select class="form-select" id="updated_payment_type">
-                      <option value="Kreditkarte">Kreditkarte</option>
-                      <option value="PayPal">PayPal</option>
-                      <option value="Bankeinzug">Bankeinzug</option>
-                    </select>
+                    <label class="form-label">Neues Passwort</label>
+                    <input
+                      type="password"
+                      name="new_password"
+                      class="form-control"
+                    />
                   </div>
                   <div class="mb-3">
-                    <label for="updated_payment_details" class="form-label">Details</label>
-                    <input type="text" class="form-control" id="updated_payment_details" placeholder="Details">
+                    <label class="form-label">Neues Passwort wiederholen</label>
+                    <input
+                      type="password"
+                      name="repeat_password"
+                      class="form-control"
+                    />
                   </div>
-                </div>
-
-                <!-- Gemeinsame Felder -->
-                <div class="col-12 mt-2">
-                  <label class="form-label">Passwort zur Bestätigung</label>
-                  <input type="password" name="password" class="form-control">
-                </div>
-
-                <!-- Zentraler Button -->
-                <div class="mt-3">
-                  <button type="submit" class="btn btn-success">Zahlung speichern</button>
-                </div>
-              </form>
-            </div>
-
-            <!-- Passwort ändern -->
-            <div class="tab-pane fade" id="passwortTab">
-              <form id="passwortForm">
-                <div class="mb-3">
-                  <label class="form-label">Aktuelles Passwort</label>
-                  <input type="password" name="current_password" class="form-control">
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Neues Passwort</label>
-                  <input type="password" name="new_password" class="form-control">
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Neues Passwort wiederholen</label>
-                  <input type="password" name="repeat_password" class="form-control">
-                </div>
-                <button type="submit" class="btn btn-warning">Passwort ändern</button>
-              </form>
+                  <button type="submit" class="btn btn-warning">
+                    Passwort ändern
+                  </button>
+                </form>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="modal-footer">
-          <span id="modalUpdateMessage" class="me-auto"></span>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
+          <div class="modal-footer">
+            <span id="modalUpdateMessage" class="me-auto"></span>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Schließen
+            </button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</body>
-
+  </body>
 </html>
