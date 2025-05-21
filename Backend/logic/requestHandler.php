@@ -39,7 +39,7 @@ switch ($action) {
     case 'listCustomers':
     case 'toggleCustomer':
     case 'getCustomerOrders':
-    case 'deleteOrderItem':    
+    case 'deleteOrderItem':
     case 'updateOrderItemQuantity':
         require './handlers/userHandler.php';
         break;

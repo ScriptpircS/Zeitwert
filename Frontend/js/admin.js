@@ -1,4 +1,3 @@
-// ========== SEITENLADUNG ==========
 $(document).ready(function () {
   $("#btnCreate").click(showCreateForm);
   $("#btnRUD").click(fetchAdminProducts);
@@ -303,13 +302,13 @@ function renderAdminCoupons(coupons) {
 
     if (coupon.status === "eingelöst") {
       statusText = "eingelöst";
-      statusClass = "text-secondary"; // grau
+      statusClass = "text-secondary";
     } else if (ablaufdatum < heute) {
       statusText = "abgelaufen";
-      statusClass = "text-danger"; // rot
+      statusClass = "text-danger";
     } else {
       statusText = "offen";
-      statusClass = "text-success"; // grün
+      statusClass = "text-success";
     }
 
     const $card = $(`
